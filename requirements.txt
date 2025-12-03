@@ -8,3 +8,4 @@ numpy
 fastapi
 uvicorn
 rich
+git remote add origin <paste-link-here>
