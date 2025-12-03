@@ -1,0 +1,41 @@
+[
+  {
+    "checkpoint_id": "ckpt_001",
+    "topic": "Newton's Second Law",
+    "objectives": [
+      "Define Newton's Second Law",
+      "Apply F=ma to compute acceleration",
+      "Solve a simple F=ma problem"
+    ],
+    "success_criteria": {
+      "min_score_percent": 70,
+      "num_questions": 3
+    },
+    "resources": {
+      "web_search_queries": [
+        "newtons second law simple explanation",
+        "F = ma examples for beginners"
+      ]
+    }
+  },
+
+  {
+    "checkpoint_id": "ckpt_002",
+    "topic": "Ohm's Law",
+    "objectives": [
+      "State Ohm's law V = IR",
+      "Explain relationship between voltage, current, resistance",
+      "Solve basic V = IR problems"
+    ],
+    "success_criteria": {
+      "min_score_percent": 70,
+      "num_questions": 3
+    },
+    "resources": {
+      "web_search_queries": [
+        "ohm's law simple explanation",
+        "voltage current resistance relationship"
+      ]
+    }
+  }
+]

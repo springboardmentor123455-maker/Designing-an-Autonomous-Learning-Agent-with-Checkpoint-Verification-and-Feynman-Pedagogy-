@@ -1,0 +1,10 @@
+langgraph
+openai
+python-dotenv
+requests
+sentence-transformers
+scikit-learn
+numpy
+fastapi
+uvicorn
+rich
