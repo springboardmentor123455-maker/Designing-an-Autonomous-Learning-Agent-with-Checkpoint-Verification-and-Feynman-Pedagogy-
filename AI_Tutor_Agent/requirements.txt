@@ -1,0 +1,10 @@
+langgraph
+langchain
+openai
+langchain-community
+langchain-tavily
+streamlit
+python-dotenv
+tavily-python
+tiktoken
+langsmith
