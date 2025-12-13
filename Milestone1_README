@@ -1,0 +1,46 @@
+# Autonomous Learning Agent: The "Self-Verifying" AI Tutor
+
+![Project Phase](https://img.shields.io/badge/Phase-Milestone%201%20Complete-success)
+![Architecture](https://img.shields.io/badge/Architecture-LangGraph%20%7C%20RAG-blueviolet)
+![Models](https://img.shields.io/badge/Models-Phi--3.5%20%7C%20Qwen%202.5-blue)
+
+## Executive Summary
+The **Autonomous Learning Agent** is a next-generation AI tutoring system designed to solve the "Hallucination" and "Lack of Structure" problems in self-directed learning. Unlike standard chatbots that simply generate text, this agent operates as a **Stateful Intelligent System**. It follows a rigorous pedagogical workflow: researching, verifying, grading, and correcting its own work before presenting it to the learner.
+
+Built on **LangGraph**, the system implements a **Hybrid RAG (Retrieval-Augmented Generation)** pipeline. It intelligently switches between local user notes and autonomous web research to provide the most accurate, cited answers possible.
+
+---
+
+## The Problem It Solves
+Self-learning complex technical topics (like Deep Learning or Quantum Computing) is difficult for two reasons:
+1.  **Information Overload:** Searching the web yields too many results, many of which are irrelevant.
+2.  **Lack of Verification:** When asking standard AIs for help, they often "hallucinate" (invent facts) or give shallow answers without sources.
+
+**This Agent's Solution:** A "Glass Box" architecture that forces the AI to **cite its sources** and **grade its own accuracy** using a secondary intelligence layer.
+
+---
+
+## System Architecture
+
+The agent functions as a cyclical graph workflow rather than a linear chain. It maintains a memory of its current "state" (Topic, Context, Retries) and moves between nodes based on logic.
+
+### The Workflow Diagram
+```mermaid
+graph TD
+    Start([User Starts Checkpoint]) --> Ingest[Ingest & Verify Context]
+    
+    Ingest -->|Context Missing/Thin| Search[Autonomous Web Search]
+    Ingest -->|Context Sufficient| Generate[Draft Technical Summary]
+    Search --> Generate
+    
+    Generate --> Validate[Peer Review (Self-Correction)]
+    
+    Validate -->|Score < 4/5 (Retry)| Generate
+    Validate -->|Score >= 4/5 (Pass)| Finalize[🏁 Finalize & Present]
+    Validate -->|Max Retries Reached| Finalize
+    
+    style Start fill:#2ecc71,stroke:#27ae60,color:white
+    style Ingest fill:#3498db,stroke:#2980b9,color:white
+    style Search fill:#f1c40f,stroke:#f39c12,color:white
+    style Generate fill:#9b59b6,stroke:#8e44ad,color:white
+    style Validate fill:#e74c3c,stroke:#c0392b,color:white
