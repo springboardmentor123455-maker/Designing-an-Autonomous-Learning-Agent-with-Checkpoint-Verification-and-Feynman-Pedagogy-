@@ -1,0 +1,11 @@
+langgraph
+langchain
+langchain-huggingface
+langchain-community
+duckduckgo-search
+python-dotenv
+pypdf
+faiss-cpu
+sentence-transformers
+huggingface-hub
+fpdf
