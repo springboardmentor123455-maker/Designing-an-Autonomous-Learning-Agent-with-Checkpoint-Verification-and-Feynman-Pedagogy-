@@ -8,3 +8,6 @@ python-dotenv
 tavily-python
 tiktoken
 langsmith
+langchain_text_splitters
+langchain_openai
+faiss-cpu
