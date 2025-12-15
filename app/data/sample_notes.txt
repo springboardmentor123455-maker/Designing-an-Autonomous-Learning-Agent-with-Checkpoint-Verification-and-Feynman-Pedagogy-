@@ -1,0 +1,12 @@
+Supervised learning is a type of machine learning where the model is trained using labeled data.
+Each data point has input features and a known label or target.
+
+Logistic regression is a supervised learning algorithm used mainly for binary classification.
+It uses the sigmoid function to map any real value into a probability between 0 and 1.
+
+Accuracy measures the fraction of correct predictions.
+Precision measures how many predicted positives are actually positive.
+Recall measures how many actual positives were correctly predicted.
+The F1-score is the harmonic mean of precision and recall.
+
+

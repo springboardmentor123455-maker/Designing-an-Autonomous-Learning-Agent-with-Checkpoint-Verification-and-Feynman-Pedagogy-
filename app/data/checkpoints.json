@@ -1,0 +1,48 @@
+{
+  "checkpoints": [
+    {
+      "id": "cp1",
+      "title": "Basics of Supervised Learning",
+      "description": "Understand the core idea of supervised learning and labeled data.",
+      "objectives": [
+        "Explain what supervised learning is",
+        "Differentiate between features and labels",
+        "Give two real-world examples of supervised learning"
+      ],
+      "success_criteria": "Learner can clearly define supervised learning and provide correct examples."
+    },
+    {
+      "id": "cp2",
+      "title": "Logistic Regression Fundamentals",
+      "description": "Cover the intuition and basic math of logistic regression.",
+      "objectives": [
+        "Explain why logistic regression is used for classification",
+        "Describe the sigmoid function in simple terms",
+        "Interpret model output as probabilities"
+      ],
+      "success_criteria": "Learner can intuitively explain logistic regression and when to use it."
+    },
+    {
+      "id": "cp3",
+      "title": "Evaluation Metrics for Classification",
+      "description": "Understand accuracy, precision, recall, and F1-score.",
+      "objectives": [
+        "Define accuracy, precision, recall, and F1-score",
+        "Explain trade-off between precision and recall",
+        "Relate metrics to confusion matrix"
+      ],
+      "success_criteria": "Learner can choose an appropriate metric for a given problem."
+    },
+    {
+      "id": "cp4",
+      "title": "Overfitting and Regularization",
+      "description": "Learn why overfitting happens and how regularization helps.",
+      "objectives": [
+        "Explain what overfitting is with an example",
+        "Describe the role of regularization",
+        "Differentiate between L1 and L2 regularization at a high level"
+      ],
+      "success_criteria": "Learner can identify overfitting and describe basic mitigation strategies."
+    }
+  ]
+}
