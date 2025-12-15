@@ -1,0 +1,11 @@
+langgraph
+langchain
+langchain-community
+langchain-text-splitters
+transformers
+accelerate
+sentencepiece
+wikipedia
+tabulate
+faiss-cpu
+sentence-transformers
