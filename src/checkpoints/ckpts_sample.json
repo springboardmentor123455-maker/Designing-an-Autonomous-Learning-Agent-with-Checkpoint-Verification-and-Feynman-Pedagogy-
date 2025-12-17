@@ -1,40 +1,96 @@
 [
   {
     "checkpoint_id": "ckpt_001",
-    "topic": "Newton's Second Law",
+    "topic": "IoT Fundamentals & Architecture",
     "objectives": [
-      "Define Newton's Second Law",
-      "Apply F=ma to compute acceleration",
-      "Solve a simple F=ma problem"
+      "Define the Internet of Things (IoT)",
+      "Explain the core components of an IoT system",
+      "Describe device, gateway, cloud, and application layers"
     ],
     "success_criteria": {
       "min_score_percent": 70,
-      "num_questions": 3
+      "num_questions": 4
     },
     "resources": {
       "web_search_queries": [
-        "newtons second law simple explanation",
-        "F = ma examples for beginners"
+        "IoT architecture explained",
+        "IoT system components device gateway cloud"
       ]
     }
   },
-
   {
     "checkpoint_id": "ckpt_002",
-    "topic": "Ohm's Law",
+    "topic": "Sensor & Actuator Specifications",
     "objectives": [
-      "State Ohm's law V = IR",
-      "Explain relationship between voltage, current, resistance",
-      "Solve basic V = IR problems"
+      "Identify common sensors and actuators used in IoT",
+      "Explain sensor specifications such as accuracy and range",
+      "Select sensors based on application requirements"
     ],
     "success_criteria": {
       "min_score_percent": 70,
-      "num_questions": 3
+      "num_questions": 4
     },
     "resources": {
       "web_search_queries": [
-        "ohm's law simple explanation",
-        "voltage current resistance relationship"
+        "sensor specifications accuracy resolution range",
+        "actuators in IoT systems"
+      ]
+    }
+  },
+  {
+    "checkpoint_id": "ckpt_003",
+    "topic": "IoT Communication Protocols",
+    "objectives": [
+      "Compare MQTT, HTTP, CoAP, LoRaWAN, and BLE",
+      "Choose protocols based on latency, power, and bandwidth",
+      "Explain MQTT publish-subscribe communication"
+    ],
+    "success_criteria": {
+      "min_score_percent": 70,
+      "num_questions": 4
+    },
+    "resources": {
+      "web_search_queries": [
+        "MQTT vs HTTP vs CoAP",
+        "IoT communication protocols comparison"
+      ]
+    }
+  },
+  {
+    "checkpoint_id": "ckpt_004",
+    "topic": "IoT Security & Data Privacy",
+    "objectives": [
+      "Identify common IoT security threats",
+      "Explain authentication and encryption in IoT",
+      "Describe secure firmware update mechanisms"
+    ],
+    "success_criteria": {
+      "min_score_percent": 70,
+      "num_questions": 4
+    },
+    "resources": {
+      "web_search_queries": [
+        "IoT security threats",
+        "device authentication and encryption IoT"
+      ]
+    }
+  },
+  {
+    "checkpoint_id": "ckpt_005",
+    "topic": "Edge Computing & Cloud Integration in IoT",
+    "objectives": [
+      "Differentiate edge computing and cloud computing",
+      "Decide where data processing should occur",
+      "Explain an edge–cloud IoT data pipeline"
+    ],
+    "success_criteria": {
+      "min_score_percent": 70,
+      "num_questions": 4
+    },
+    "resources": {
+      "web_search_queries": [
+        "edge computing vs cloud computing IoT",
+        "IoT edge cloud architecture"
       ]
     }
   }
