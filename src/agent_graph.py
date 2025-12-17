@@ -3,6 +3,10 @@ from langgraph.graph import StateGraph, END
 import json
 from pathlib import Path
 
+from gemini_client import gemini_evaluate, gemini_feynman
+import json
+
+
 EVALUATION_RULES = {
     "Newton's Second Law": [
         "force",
@@ -85,7 +89,7 @@ def load_checkpoints():
     
 def teach_checkpoint(state: AgentState) -> AgentState:
     cp = state["checkpoints"][state["current_checkpoint"]]
-    print(f"\n📘 CHECKPOINT {state['current_checkpoint'] + 1}")
+    print(f"\n CHECKPOINT {state['current_checkpoint'] + 1}")
     print("Topic:", cp["topic"])
     print("Objectives:")
     for obj in cp["objectives"]:
@@ -93,27 +97,39 @@ def teach_checkpoint(state: AgentState) -> AgentState:
     return state
 
 def ask_question(state: AgentState) -> AgentState:
-    print("\n❓ Explain this topic in your own words:")
+    print("\n Explain this topic in your own words:")
     state["user_input"] = input("Your answer: ")
     return state
 
 def evaluate_answer(state: AgentState) -> AgentState:
-    answer = state["user_input"].strip()
-    if len(answer) > 25:
-        state["score"] = 1.0
-        state["passed"] = True
-    else:
+    cp = state["checkpoints"][state["current_checkpoint"]]
+
+    raw = gemini_evaluate(
+        cp["topic"],
+        cp["objectives"],
+        state["user_input"]
+    )
+
+    try:
+        data = json.loads(raw)
+        state["score"] = float(data.get("score", 0))
+        state["passed"] = state["score"] >= 0.7
+        print(f" Gemini score: {state['score']}")
+    except Exception:
+        print(" Gemini evaluation failed, defaulting to fail.")
         state["score"] = 0.0
         state["passed"] = False
+
     return state
+
 
 def decide_next(state: AgentState) -> AgentState:
     if state["passed"]:
-        print("✅ Passed. Moving to next checkpoint.")
+        print("Passed. Moving to next checkpoint.")
         state["current_checkpoint"] += 1
         state["explanation_level"] = "normal"
     else:
-        print("❌ Not sufficient. Switching to Feynman explanation.")
+        print(" Not sufficient. Switching to Feynman explanation.")
     return state
 
 
@@ -150,16 +166,8 @@ def build_graph():
 
 def feynman_explain(state: AgentState) -> AgentState:
     cp = state["checkpoints"][state["current_checkpoint"]]
-    topic = cp["topic"]
-
-    print("\n🧠 Feynman Explanation (Simple & Practical):")
-    print("Topic:", topic)
-
-    explanation = FEYNMAN_EXPLANATIONS.get(
-        topic,
-        "Let's explain this topic in very simple terms with an everyday example."
-    )
-
+    print("\n Feynman Explanation (Gemini):")
+    explanation = gemini_feynman(cp["topic"], cp["objectives"])
     print(explanation)
 
     state["explanation_level"] = "feynman"
