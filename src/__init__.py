@@ -1,1 +1,3 @@
-"""Autonomous Learning Agent - Core Package"""
+"""
+__init__.py files to make directories proper Python packages
+"""
