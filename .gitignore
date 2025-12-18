@@ -38,6 +38,8 @@ data/chroma_db/
 data/progress.db
 data/embeddings/
 data/cache/
+chroma_db/
+*.sqlite3
 
 # Jupyter and notebooks
 .ipynb_checkpoints/
