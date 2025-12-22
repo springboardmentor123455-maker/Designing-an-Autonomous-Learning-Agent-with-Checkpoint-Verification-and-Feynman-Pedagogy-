@@ -1,25 +1,37 @@
-# Autonomous Learning Agent
+# Milestone 2: Autonomous Assessment & Grading Engine
 
-## 1. Overview
-This system is an **Autonomous AI Tutor** designed to guide learners through a structured curriculum. It uses a local RAG (Retrieval-Augmented Generation) pipeline to fetch content, generate questions, and grade answers automatically.
+## 📌 Project Overview
+This module implements the **Evaluation Layer** of the Autonomous Learning Agent. It is designed to autonomously generate unique assessment questions based on dynamic knowledge bases (Wikipedia/User Notes) and strictly evaluate learner responses using a **Triple-Layer Semantic Grading System**.
 
-## 2. Core Features
-* **5-Stage Curriculum:** Covers Machine Learning, Supervised Learning, Unsupervised Learning, Neural Networks, and Reinforcement Learning.
-* **Local RAG Engine:** Uses **FAISS** and **RecursiveCharacterTextSplitter** to chunk and embed Wikipedia data locally.
-* **Smart Assessment:**
-    * **Generates Questions:** Creates 3 targeted questions per topic.
-    * **Self-Audit:** The AI evaluates its own questions before showing them.
-    * **Auto-Grading:** Scores student answers against the RAG context.
-* **100% Offline Capability:** Powered by `google/flan-t5-base` and `HuggingFace Embeddings`.
+## 🚀 Key Features
 
-## 3. Evaluation Results
-| Metric | Result |
-| :--- | :--- |
-| **Curriculum Coverage** | 100% (5/5 Checkpoints) |
-| **Question Relevance** | 5/5 (Audited) |
-| **Grading Accuracy** | 100% |
-| **System Uptime** | 100% (Local Mode) |
+### 1. Dynamic Context Retrieval (RAG)
+- **Hybrid Source Selection:** Automatically prioritizes "User Notes" if available; falls back to live "Wikipedia API" search if notes are missing.
+- **Vector Database:** Uses **FAISS** (Facebook AI Similarity Search) to index and retrieve only the most relevant text chunks.
 
-## 4. How to Run
-1.  **Install:** `pip install -r requirements.txt`
-2.  **Run:** `python agent_phase_2`
+### 2. Intelligent Question Generation
+- **Anti-Hallucination Constraints:** Strictly enforces open-ended questions.
+- **MCQ Firewall:** Contains logic filters to reject "Which of the following" style outputs, ensuring deep-learning assessment.
+- **Relevance Auditing:** Every generated question is scored (0-5) against the source text before being shown to the user.
+
+### 3. Triple-Layer "Strong" Grading System
+To ensure human-like accuracy, the agent uses three concurrent evaluation metrics:
+1.  **Vector Similarity (Cosine):** Measures the semantic closeness of the answer to the ground truth.
+2.  **Keyword Forensics (TF-IDF):** Scans for critical technical terminology extracted from the context.
+3.  **LLM Judgment:** A local LLM (Flan-T5) acts as a final judge to catch logically correct answers that might miss specific keywords.
+
+## 🛠️ Tech Stack
+- **Orchestration:** LangGraph (State Management)
+- **LLM:** Google Flan-T5 (Local Inference)
+- **Embeddings:** HuggingFace `all-MiniLM-L6-v2`
+- **Math:** Scikit-Learn (Cosine Similarity)
+- **Search:** Wikipedia API Wrapper
+
+## 📊 Logic Flow
+1.  **Ingest:** Checkpoint Title -> Fetch Data -> Chunking.
+2.  **Generate:** Create 5 unique questions -> Audit for Relevance.
+3.  **Interact:** User answers questions via console.
+4.  **Evaluate:** Apply Triple-Layer Grading -> Calculate Score.
+5.  **Decision:**
+    - Score > 70%: **PASS** (Proceed to next module).
+    - Score < 70%: **FAIL** (Trigger Remediation - *Milestone 3*).
