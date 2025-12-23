@@ -11,9 +11,10 @@ class AgentState(TypedDict):
     retry_count: int
     logs: Annotated[List[str], operator.add]
 
-    processed_context: List[str] 
+    processed_context: List[str]
+    formatted_content: str  # Clean, presentable study material
     
-    quiz_questions: List[Dict[str, Any]] # List of {question, correct_answer}
+    quiz_questions: List[Dict[str, Any]]
     
     user_answers: Dict[str, str]
-    quiz_score: int # 0-100
+    quiz_score: int
