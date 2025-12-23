@@ -178,3 +178,11 @@ Score ≥ 70%? → Yes: Move to Next Checkpoint
    - Tracks completed checkpoints
    - Remembers retry count for each checkpoint
    - Guides you through sequential learning path
+
+---
+
+## Website
+
+Url: **[https://ai-study-system-feynman.streamlit.app/](https://ai-study-system-feynman.streamlit.app/)**
+
+---
