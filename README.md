@@ -1,1 +1,1 @@
-# Designing-an-Autonomous-Learning-Agent-with-Checkpoint-Verification-and-Feynman-Pedagogy-
+# An Autonomous Learning Agent with Checkpoint Verification and Feynman Pedagogy
