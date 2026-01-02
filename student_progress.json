@@ -1,0 +1,96 @@
+[
+  {
+    "checkpoint": "Introduction to Cybersecurity",
+    "score": 5,
+    "weak_areas": [
+      "* Understand what cybersecurity means",
+      "* Know why cybersecurity is important",
+      "* Identify basic cyber threats"
+    ],
+    "next": "Threats and Vulnerabilities"
+  },
+  {
+    "checkpoint": "Threats and Vulnerabilities",
+    "score": 4,
+    "weak_areas": [
+      "* Understand the difference between threats and vulnerabilities",
+      "* Recognize malware, phishing, ransomware"
+    ],
+    "next": "Authentication and Authorization"
+  },
+  {
+    "checkpoint": "Authentication and Authorization",
+    "score": 3,
+    "weak_areas": [
+      "* Authentication vs authorization concepts",
+      "* Multi-factor authentication (MFA) methods",
+      "* Biometric authentication techniques",
+      "* Password management best practices"
+    ],
+    "next": "Authentication and Authorization"
+  },
+  {
+    "checkpoint": "Network Security Basics",
+    "score": 4,
+    "weak_areas": [
+      "* Firewalls configuration and implementation",
+      "* Proxy server setup and management",
+      "* VPN protocol selection and deployment",
+      "* Network segmentation and isolation techniques",
+      "* Secure network design principles and best practices"
+    ],
+    "next": "Cryptography Basics"
+  },
+  {
+    "checkpoint": "Cryptography Basics",
+    "score": 1,
+    "weak_areas": [
+      "* Understanding the differences between symmetric and asymmetric encryption",
+      "* Familiarity with decryption methods and techniques",
+      "* Knowledge of key management and exchange processes",
+      "* Application of encryption and decryption in real-world scenarios",
+      "* Understanding the strengths and weaknesses of various encryption algorithms"
+    ],
+    "next": "Cryptography Basics"
+  },
+  {
+    "checkpoint": "Introduction to Cybersecurity",
+    "score": 5,
+    "weak_areas": [
+      "* Understand what cybersecurity means",
+      "* Know why cybersecurity is important",
+      "* Identify basic cyber threats"
+    ],
+    "next": "Threats and Vulnerabilities"
+  },
+  {
+    "checkpoint": "Introduction to Cybersecurity",
+    "score": 5,
+    "weak_areas": [
+      "* Understand what cybersecurity means",
+      "* Know why cybersecurity is important",
+      "* Identify basic cyber threats"
+    ],
+    "next": "Threats and Vulnerabilities"
+  },
+  {
+    "checkpoint": "Threats and Vulnerabilities",
+    "score": 4,
+    "weak_areas": [
+      "* Understand the difference between threats and vulnerabilities",
+      "* Recognize malware, phishing, ransomware"
+    ],
+    "next": "Authentication and Authorization"
+  },
+  {
+    "checkpoint": "Authentication and Authorization",
+    "score": 3,
+    "weak_areas": [
+      "* Authentication vs authorization concepts",
+      "* Multi-factor authentication (MFA) methods",
+      "* Biometric authentication techniques",
+      "* Password management best practices"
+    ],
+    "next": "Authentication and Authorization"
+  }
+]
