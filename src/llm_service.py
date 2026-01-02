@@ -12,6 +12,7 @@ import re
 from typing import List, Dict, Any
 from langchain_ollama import OllamaLLM
 from .models import ProcessedContext, GeneratedQuestion
+from .langsmith_config import trace_llm_operation, get_langsmith_callbacks
 
 logger = logging.getLogger(__name__)
 
@@ -20,8 +21,11 @@ class LLMService:
     
     def __init__(self, model_name: str = "llama3.1:latest"):
         """Initialize LLM service."""
-        self.llm = OllamaLLM(model=model_name)
+        # Get LangSmith callbacks for tracing
+        callbacks = get_langsmith_callbacks()
+        self.llm = OllamaLLM(model=model_name, callbacks=callbacks)
         
+    @trace_llm_operation("generate_questions")
     async def generate_questions(self, context_chunks: List[ProcessedContext], 
                                checkpoint_requirements: List[str]) -> List[GeneratedQuestion]:
         """Generate 3-5 questions with at least 1 multiple choice question."""
@@ -415,6 +419,7 @@ Each question must be directly answerable using the provided content and must te
             }
         ]
     
+    @trace_llm_operation("simulate_learner_answer")
     async def simulate_learner_answer(self, question: str, context_chunks: List[str], 
                                     all_context: List[ProcessedContext]) -> str:
         """Simulate a learner's answer to a question."""
@@ -444,6 +449,7 @@ Keep the answer 2-3 sentences and make it sound like a student's response.
             logger.error(f"Error simulating learner answer: {e}")
             return "I understand the basic concepts but need to study more to provide a complete answer."
     
+    @trace_llm_operation("score_answer")
     async def score_answer(self, question: str, answer: str, expected_concepts: List[str]) -> Dict[str, Any]:
         """Score a learner's answer and provide feedback."""
         try:

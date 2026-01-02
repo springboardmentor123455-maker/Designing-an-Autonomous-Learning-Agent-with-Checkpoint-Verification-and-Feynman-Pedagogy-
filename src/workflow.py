@@ -8,6 +8,7 @@ including node connections, conditional routing, and workflow orchestration.
 import logging
 from langgraph.graph import StateGraph, END
 from .models import LearningAgentState
+from .langsmith_config import langsmith_config, get_langsmith_callbacks
 from .workflow_nodes import (
     initialize_node,
     collect_materials_node, 

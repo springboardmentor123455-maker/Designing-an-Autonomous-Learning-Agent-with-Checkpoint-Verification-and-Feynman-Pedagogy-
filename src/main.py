@@ -8,10 +8,19 @@ demonstration functions that bring together all components of the system.
 import asyncio
 import logging
 import sys
+import os
+from pathlib import Path
 from typing import Optional, Dict, Any, List
+
+# Load environment variables from .env file
+from dotenv import load_dotenv
+env_path = Path(__file__).parent.parent / '.env'
+load_dotenv(dotenv_path=env_path)
+
 from .models import LearningAgentState, Checkpoint, Material
 from .workflow import create_unified_workflow
 from .sample_data import create_sample_checkpoint, create_sample_materials
+from .langsmith_config import langsmith_config, trace_document_retrieval
 from .interactive import (
     display_welcome, select_checkpoint, display_question, 
     display_results, get_user_evaluation, display_system_metrics

@@ -7,6 +7,9 @@ langchain>=0.2.0
 langchain-community>=0.2.0
 langchain-core>=0.2.0
 
+# LangSmith for monitoring and tracing
+langsmith>=0.1.0
+
 # LLM Integration (Ollama)
 langchain-ollama>=0.1.0
 ollama>=0.3.0
@@ -24,6 +27,7 @@ nltk>=3.8.0
 # Data Handling
 numpy>=1.24.0
 pandas>=2.0.0
+python-dotenv>=1.0.0
 
 # HTTP and Async
 httpx>=0.25.0

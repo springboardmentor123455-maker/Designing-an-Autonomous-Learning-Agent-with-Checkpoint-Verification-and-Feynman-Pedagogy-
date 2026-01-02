@@ -132,6 +132,10 @@ logging.getLogger("chromadb").setLevel(logging.WARNING)
 for handler in logging.getLogger().handlers:
     handler.setFormatter(UnicodeFormatter("%(asctime)s - %(levelname)s - %(message)s"))
 
+# Load environment variables for LangSmith
+from dotenv import load_dotenv
+load_dotenv()
+
 # Check for dependencies and import main components
 try:
     from src.main import main
@@ -139,6 +143,14 @@ try:
     from src.sample_data import create_sample_checkpoint, create_sample_materials
     from src.workflow import create_unified_workflow
     from src.main import run_learning_session, interactive_mode
+    # Initialize LangSmith configuration
+    from src.langsmith_config import langsmith_config
+    
+    if langsmith_config.enabled:
+        print("✅ LangSmith tracing enabled")
+    else:
+        print("⚠️ LangSmith tracing disabled")
+        
 except ImportError as e:
     print(f"Missing dependencies or modules. Install with: pip install -r requirements.txt")
     print(f"Error: {e}")

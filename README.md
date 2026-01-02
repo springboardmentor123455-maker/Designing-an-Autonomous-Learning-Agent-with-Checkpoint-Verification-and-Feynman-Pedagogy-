@@ -1,24 +1,36 @@
 # 🎓 Interactive Learning Agent System
 
-**An autonomous AI tutoring system with personalized checkpoints, adaptive questioning, and Feynman pedagogy.**
+**An autonomous AI tutoring system with personalized checkpoints, adaptive questioning, LangSmith tracing, and Feynman pedagogy.**
 
 ## 🎯 Project Overview
 
 This system implements a complete autonomous learning agent using LangGraph that provides structured, personalized tutoring experiences. The agent guides users through sequential learning checkpoints, generates contextual questions, and employs mastery-based progression with the Feynman Technique for adaptive simplification.
 
-### 🌟 Core Objectives
-- **Structured Guidance**: Clear learning paths through sequential checkpoints
-- **Flexible Content**: Dynamic content retrieval and user-provided materials
-- **Rigorous Assessment**: Automatic question generation with 70% threshold verification
-- **Adaptive Simplification**: Feynman Technique for concept re-explanation
-- **Mastery-Based Progression**: Strict checkpoint completion requirements
-- **Interactive Interface**: Full user interaction and feedback system
+### 🌟 Core Features
+- **🎯 Structured Learning Paths**: Sequential checkpoint-based progression
+- **📚 Flexible Content Support**: Dynamic content retrieval + user materials
+- **🧠 Adaptive AI Tutoring**: Context-aware question generation
+- **📊 LangSmith Integration**: Comprehensive workflow monitoring and tracing
+- **🔍 Smart Document Retrieval**: Search query optimization and tracking
+- **📈 Rigorous Assessment**: 70% mastery threshold with automatic retry
+- **🔄 Feynman Technique**: Adaptive concept simplification
+- **💬 Interactive Interface**: Real-time user interaction and feedback
+- **⚡ Performance Monitoring**: End-to-end observability with LangSmith
+
+### 🔧 Technical Stack
+- **Framework**: LangGraph for workflow orchestration
+- **LLM**: Ollama (llama3.1) for AI operations
+- **Vector Store**: ChromaDB for document embeddings
+- **Monitoring**: LangSmith EU for tracing and observability
+- **Search**: DuckDuckGo integration for content discovery
+- **Environment**: Python 3.8+ with virtual environment support
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Python 3.8+
 - Ollama installed and running
+- LangSmith account (optional, for monitoring)
 - 4GB+ RAM recommended
 
 ### 1. Environment Setup
@@ -137,12 +149,41 @@ config.json                # Runtime configuration
 The system uses sensible defaults but can be customized:
 
 ```python
-# In learning_agent.py, you can modify:
-EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-LLM_MODEL = "llama3.2:1b"
-CHUNK_SIZE = 1000
-CHUNK_OVERLAP = 200
-THRESHOLD = 0.7  # 70% threshold for checkpoint completion
+# Configure in .env file:
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.1
+EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+THRESHOLD=0.7  # 70% threshold for checkpoint completion
+
+# LangSmith Integration (Optional)
+LANGCHAIN_API_KEY=your_langsmith_api_key
+LANGCHAIN_ENDPOINT=https://eu.api.smith.langchain.com
+LANGCHAIN_PROJECT=default
+ENABLE_LANGSMITH=true
+```
+
+## 🔍 LangSmith Integration
+
+### Real-Time Monitoring
+The system includes comprehensive LangSmith integration for monitoring:
+
+- **🔍 Search Query Tracking**: Monitor document retrieval operations
+- **🧠 LLM Operation Tracing**: Track AI model calls and responses  
+- **📊 Workflow Monitoring**: Visualize learning session progression
+- **🐛 Error Tracking**: Real-time debugging and performance analysis
+- **📈 Analytics**: Learning effectiveness and system performance
+
+### Configuration
+```bash
+# Set up LangSmith monitoring
+export LANGCHAIN_API_KEY="your_api_key"
+export LANGCHAIN_ENDPOINT="https://eu.api.smith.langchain.com"
+export LANGCHAIN_PROJECT="Learning-Agent-System"
+```
+
+### Test Integration
+```bash
+python test_langsmith.py  # Validates tracing setup
 ```
 
 ## 📊 Example Output
@@ -311,21 +352,49 @@ logging.basicConfig(level=logging.DEBUG)
 # Then run learning_agent.py
 ```
 
+## � Project Structure
+
+```
+📦 Learning-Agent-System/
+├── 📄 README.md                    # Project documentation
+├── 📄 requirements.txt            # Python dependencies
+├── 📄 .env                        # Environment configuration
+├── 📄 .gitignore                  # Git ignore patterns
+├── 📄 test_langsmith.py          # LangSmith integration tests
+├── 📁 src/                       # Core application code
+│   ├── 📄 __init__.py
+│   ├── 📄 main.py                # Main learning session entry point
+│   ├── 📄 workflow.py           # LangGraph workflow definition
+│   ├── 📄 workflow_nodes.py     # Individual workflow nodes
+│   ├── 📄 llm_service.py        # LLM operations and prompts
+│   ├── 📄 models.py             # Data models and state management
+│   ├── 📄 context_processor.py  # Document processing utilities
+│   ├── 📄 langsmith_config.py   # LangSmith tracing configuration
+│   ├── 📄 sample_data.py        # Sample learning materials
+│   └── 📄 interactive.py        # Interactive user interface
+├── 📁 .venv/                     # Virtual environment (generated)
+└── 📁 chroma_db/                # Vector database storage (generated)
+```
+
 ## 🛣️ Future Extensions
 
 ### **Planned Enhancements (Milestone 3+)**
-- **Feynman Teaching**: Replace placeholder with interactive teaching
-- **Multi-Modal Learning**: Support images, videos, audio
-- **Adaptive Difficulty**: Dynamic question complexity adjustment
-- **Personalization**: Individual learning style optimization
-- **Analytics Dashboard**: Visual learning progress tracking
-- **Collaborative Features**: Team learning and peer review
+- **🍎 Feynman Teaching**: Replace placeholder with interactive teaching
+- **🎥 Multi-Modal Learning**: Support images, videos, audio
+- **⚡ Adaptive Difficulty**: Dynamic question complexity adjustment
+- **👤 Personalization**: Individual learning style optimization
+- **📊 Analytics Dashboard**: Visual learning progress tracking
+- **👥 Collaborative Features**: Team learning and peer review
+- **🔍 Advanced Search**: Semantic search with query optimization
+- **📱 Mobile Interface**: Progressive web app for mobile learning
 
 ### **Integration Possibilities**
-- **LMS Integration**: Canvas, Blackboard, Moodle compatibility
-- **Content APIs**: Wikipedia, Khan Academy, Coursera integration
-- **Assessment Tools**: Automated quiz generation and grading
-- **Progress Tracking**: Long-term learning path management
+- **🎓 LMS Integration**: Canvas, Blackboard, Moodle compatibility
+- **📚 Content APIs**: Wikipedia, Khan Academy, Coursera integration
+- **📝 Assessment Tools**: Automated quiz generation and grading
+- **📈 Progress Tracking**: Long-term learning path management
+- **🤖 AI Models**: Support for multiple LLM providers
+- **☁️ Cloud Deployment**: Scalable cloud infrastructure
 
 ## 📚 Dependencies
 
@@ -339,6 +408,10 @@ langchain-ollama>=0.2.0
 # Vector Storage & Embeddings  
 chromadb>=0.5.0
 sentence-transformers>=2.0.0
+
+# Monitoring & Observability
+langsmith>=0.1.0
+python-dotenv>=1.0.0
 
 # ML & Processing
 torch>=2.0.0

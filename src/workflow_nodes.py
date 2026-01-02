@@ -11,6 +11,7 @@ import logging
 from .models import LearningAgentState
 from .context_processor import ContextProcessor
 from .llm_service import LLMService
+from .langsmith_config import trace_workflow_node, trace_document_retrieval
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,7 @@ llm_service = LLMService()
 # MILESTONE 1 NODES
 # ================================
 
+@trace_workflow_node("initialize")
 async def initialize_node(state: LearningAgentState) -> LearningAgentState:
     """Initialize the learning session."""
     logger.info("🚀 Initializing learning session...")
@@ -42,6 +44,7 @@ async def initialize_node(state: LearningAgentState) -> LearningAgentState:
         state["errors"].append(f"Initialization error: {str(e)}")
         return state
 
+@trace_workflow_node("collect_materials")
 async def collect_materials_node(state: LearningAgentState) -> LearningAgentState:
     """Collect learning materials."""
     logger.info("📚 Collecting learning materials...")
@@ -64,6 +67,10 @@ async def collect_materials_node(state: LearningAgentState) -> LearningAgentStat
             materials = [default_material]
             state["collected_materials"] = materials
         
+        # Trace document collection for LangSmith
+        search_query = state["current_checkpoint"]["title"]
+        trace_document_retrieval(search_query, materials)
+        
         logger.info(f"📖 Collected {len(materials)} materials")
         for material in materials:
             logger.info(f"   • {material['title']} ({len(material['content'])} chars)")
@@ -76,6 +83,7 @@ async def collect_materials_node(state: LearningAgentState) -> LearningAgentStat
         state["errors"].append(f"Material collection error: {str(e)}")
         return state
 
+@trace_workflow_node("summarize_materials")
 async def summarize_materials_node(state: LearningAgentState) -> LearningAgentState:
     """Summarize collected materials."""
     logger.info("📝 Summarizing materials...")
@@ -112,7 +120,7 @@ Provide a clear, comprehensive summary that captures the essential information.
         logger.error(f"Error in summarize_materials_node: {e}")
         state["errors"].append(f"Summarization error: {str(e)}")
         return state
-
+@trace_workflow_node("evaluate_milestone1")
 async def evaluate_milestone1_node(state: LearningAgentState) -> LearningAgentState:
     """Evaluate Milestone 1 completion."""
     logger.info("⚖️ Evaluating Milestone 1...")
@@ -145,6 +153,7 @@ async def evaluate_milestone1_node(state: LearningAgentState) -> LearningAgentSt
 # MILESTONE 2 NODES
 # ================================
 
+@trace_workflow_node("process_context")
 async def process_context_node(state: LearningAgentState) -> LearningAgentState:
     """Process context with chunking and embeddings."""
     logger.info("🔄 Processing context...")
@@ -176,6 +185,7 @@ async def process_context_node(state: LearningAgentState) -> LearningAgentState:
         state["errors"].append(f"Context processing error: {str(e)}")
         return state
 
+@trace_workflow_node("generate_questions")
 async def generate_questions_node(state: LearningAgentState) -> LearningAgentState:
     """Generate questions from processed context."""
     logger.info("❓ Generating questions...")
@@ -206,6 +216,7 @@ async def generate_questions_node(state: LearningAgentState) -> LearningAgentSta
         state["errors"].append(f"Question generation error: {str(e)}")
         return state
 
+@trace_workflow_node("verify_understanding")
 async def verify_understanding_node(state: LearningAgentState) -> LearningAgentState:
     """Verify understanding through question answering."""
     logger.info("✅ Verifying understanding...")
@@ -265,6 +276,7 @@ async def verify_understanding_node(state: LearningAgentState) -> LearningAgentS
         state["errors"].append(f"Understanding verification error: {str(e)}")
         return state
 
+@trace_workflow_node("check_threshold")
 async def check_threshold_node(state: LearningAgentState) -> LearningAgentState:
     """Check if understanding meets 70% threshold."""
     logger.info("🎯 Checking threshold...")
