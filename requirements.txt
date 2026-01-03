@@ -1,0 +1,9 @@
+langchain
+langgraph
+langchain-community
+langchain-huggingface
+duckduckgo-search==7.2.1   # gives ddgs
+chromadb
+sentence-transformers
+python-dotenv
+pydantic
