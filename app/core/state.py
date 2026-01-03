@@ -1,20 +1,25 @@
-# app/core/state.py
-from typing import List, Optional, TypedDict, Dict, Any
-from langchain_core.documents import Document
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional
+
+@dataclass
+class LearningCheckpoint:
+    id: str
+    title: str
+    goals: List[str]
+    pass_score: float = 0.7
 
 
-class LearningState(TypedDict, total=False):
-    # Selected checkpoint
-    cp_key: str                      # was: checkpoint_id (renamed to avoid reserved name)
-    checkpoint: Dict[str, Any]
+@dataclass
+class LearningState:
+    active_checkpoint: Optional[LearningCheckpoint] = None
+    context: Optional[str] = None
+    vector_index: Optional[object] = None
 
-    # RAG / context
-    query: str
-    gathered_context: List[Document]
-    context_source: str            # "notes" or "web" or "mixed" or "none"
-    context_relevance_score: float
-    context_validation_feedback: str
-    context_attempts: int
+    questions: List[str] = field(default_factory=list)
+    responses: Dict[int, str] = field(default_factory=dict)
 
-    # Debug / logs
-    trace: List[str]
+    score: float = 0.0
+    weak_topics: List[str] = field(default_factory=list)
+
+    completed: List[str] = field(default_factory=list)
+    flow_state: str = "select"   # select → study → quiz → feynman → result

@@ -9,93 +9,108 @@ from app.core.context_gatherer import gather_context_for_checkpoint
 from app.core.context_validator import validate_context
 from app.config import CONTEXT_RELEVANCE_THRESHOLD, MAX_CONTEXT_ATTEMPTS
 
+from app.core.question_generator import generate_questions
+from app.core.answer_evaluator import evaluate_answer
 
-def node_define_checkpoint(state: LearningState) -> LearningState:
-    cp = state["checkpoint"]
-    trace = state.get("trace", [])
-    trace.append(f"Starting checkpoint: {cp['id']} - {cp['title']}")
-    state["trace"] = trace
+from langgraph.graph import StateGraph, END
 
-    state["query"] = f"{cp['title']} - " + "; ".join(cp["objectives"])
-    state["context_attempts"] = 0
+from app.core.state import LearningState
+from app.core.context_gatherer import collect_learning_context
+from app.core.context_processor import build_vector_index
+from app.core.question_generator import build_assessment_questions
+from app.core.answer_evaluator import evaluate_user_responses
+from app.core.feynman_explainer import simplify_with_feynman
+
+
+# -------------------------------
+# LangGraph Nodes
+# -------------------------------
+
+def define_checkpoint(state: LearningState):
+    """Initialize selected checkpoint"""
+    state.context = None
+    state.vector_index = None
+    state.questions = []
+    state.responses = {}
     return state
 
 
-def node_gather_context(state: LearningState) -> LearningState:
-    cp = state["checkpoint"]
-    topic = cp["title"]
-    objectives = cp["objectives"]
-
-    attempts = state.get("context_attempts", 0) + 1
-    state["context_attempts"] = attempts
-
-    docs, source = gather_context_for_checkpoint(topic, objectives, attempts, user_query=state.get("user_query"))
-
-    state["gathered_context"] = docs
-    state["context_source"] = source
-
-    trace = state.get("trace", [])
-    trace.append(
-        f"Gathered {len(docs)} docs from source: {source} (attempt {attempts})"
-    )
-    state["trace"] = trace
+def gather_context(state: LearningState):
+    """Collect learning material"""
+    material, _ = collect_learning_context(state.active_checkpoint)
+    state.context = material
+    state.vector_index = build_vector_index(material)
     return state
 
 
-def node_validate_context(state: LearningState) -> LearningState:
-    cp = state["checkpoint"]
-    topic = cp["title"]
-    objectives = cp["objectives"]
-    docs = state.get("gathered_context", [])
-    score, feedback = validate_context(topic, objectives, docs, state.get("user_query"), state.get("validation_backend"))
-
-
-
-    state["context_relevance_score"] = score
-    state["context_validation_feedback"] = feedback
-
-    trace = state.get("trace", [])
-    trace.append(f"Validation score={score:.2f}, feedback='{feedback}'")
-    state["trace"] = trace
+def generate_questions(state: LearningState):
+    """Generate assessment questions"""
+    state.questions = build_assessment_questions(state.active_checkpoint)
     return state
 
 
-def route_after_validation(state: LearningState) -> str:
-    score = state.get("context_relevance_score", 0.0)
-    attempts = state.get("context_attempts", 0)
+def evaluate_answers(state: LearningState):
+    """Evaluate learner understanding"""
+    answers = list(state.responses.values())
+    score, weak = evaluate_user_responses(state.questions, answers)
+    state.score = score
+    state.weak_topics = weak
+    return state
 
-    if score >= CONTEXT_RELEVANCE_THRESHOLD:
-        return END
 
-    if attempts >= MAX_CONTEXT_ATTEMPTS:
-        trace = state.get("trace", [])
-        trace.append(
-            f"Reached MAX_CONTEXT_ATTEMPTS ({attempts}) with score={score:.2f}; ending with suboptimal context."
+def feynman_teaching(state: LearningState):
+    """Simplify weak concepts using Feynman technique"""
+    explanations = []
+    for topic in state.weak_topics:
+        explanations.append(
+            simplify_with_feynman(
+                question=topic,
+                wrong_answer="",
+                context=state.context
+            )
         )
-        state["trace"] = trace
-        return END
-
-    return "gather_context"
+    state.feynman_explanations = explanations
+    return state
 
 
-def build_graph() -> Callable[[LearningState], LearningState]:
+# -------------------------------
+# Routing Logic
+# -------------------------------
+
+def route_after_evaluation(state: LearningState):
+    if state.score >= state.active_checkpoint.pass_score:
+        return "complete"
+    return "feynman"
+
+
+# -------------------------------
+# Build LangGraph
+# -------------------------------
+
+def build_learning_graph():
     graph = StateGraph(LearningState)
 
-    graph.add_node("define_checkpoint", node_define_checkpoint)
-    graph.add_node("gather_context", node_gather_context)
-    graph.add_node("validate_context", node_validate_context)
+    graph.add_node("define", define_checkpoint)
+    graph.add_node("context", gather_context)
+    graph.add_node("questions", generate_questions)
+    graph.add_node("evaluate", evaluate_answers)
+    graph.add_node("feynman", feynman_teaching)
 
-    graph.set_entry_point("define_checkpoint")
-    graph.add_edge("define_checkpoint", "gather_context")
-    graph.add_edge("gather_context", "validate_context")
+    graph.set_entry_point("define")
+
+    graph.add_edge("define", "context")
+    graph.add_edge("context", "questions")
+    graph.add_edge("questions", "evaluate")
 
     graph.add_conditional_edges(
-        "validate_context",
-        route_after_validation,
+        "evaluate",
+        route_after_evaluation,
         {
-            "gather_context": "gather_context",
-            END: END,
-        },
+            "complete": END,
+            "feynman": "feynman"
+        }
     )
+
+    graph.add_edge("feynman", END)
 
     return graph.compile()

@@ -1,28 +1,26 @@
-# app/llm/huggingface_llm.py
-from langchain_community.llms import HuggingFaceHub
-from app.config import HUGGINGFACEHUB_API_TOKEN
-
-_llm = None  # cache singleton
+from huggingface_hub import InferenceClient
+import os
 
 
-def get_llm():
-    """
-    Use HuggingFaceHub (Inference API) for Bloom.
-    This avoids provider issues seen with HuggingFaceEndpoint.
-    """
-    global _llm
-    if _llm is not None:
-        return _llm
+def call_llm(prompt: str) -> str:
+    token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
 
-    if not HUGGINGFACEHUB_API_TOKEN:
-        raise ValueError("HUGGINGFACEHUB_API_TOKEN is not set in .env")
+    if not token:
+        return "HF API key not found."
 
-    _llm = HuggingFaceHub(
-        repo_id="bigscience/bloom-560m",
-        huggingfacehub_api_token=HUGGINGFACEHUB_API_TOKEN,
-        model_kwargs={
-            "temperature": 0.2,
-            "max_new_tokens": 256,
-        },
-    )
-    return _llm
+    client = InferenceClient(token=token)
+
+    try:
+        response = client.chat_completion(
+            model="meta-llama/Llama-3.2-3B-Instruct",
+            messages=[
+                {"role": "system", "content": "You are a helpful tutor."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=400
+        )
+
+        return response.choices[0].message.content.strip()
+
+    except Exception as e:
+        return f"LLM Error: {str(e)}"

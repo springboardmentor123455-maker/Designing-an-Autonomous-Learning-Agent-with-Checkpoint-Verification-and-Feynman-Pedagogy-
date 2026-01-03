@@ -1,117 +1,76 @@
 # app/core/context_gatherer.py
-from typing import List, Tuple
-from langchain_core.documents import Document
 
-from app.rag.vectorstore import build_notes_vectorstore
-from app.config import TAVILY_API_KEY
-from langchain_tavily import TavilySearch
+from typing import Tuple
+from app.llm.huggingface_llm import call_llm
 
 
-def gather_from_notes(query: str, k: int = 5) -> List[Document]:
-    vs = build_notes_vectorstore()
-    if vs is None:
-        return []
-    return vs.similarity_search(query, k=k)
+# ------------------------------
+# Local notes (can be extended)
+# ------------------------------
+USER_NOTES = {
+    "cp1": """
+Generative AI refers to a class of artificial intelligence models that are capable of
+creating new content rather than only analyzing existing data. Unlike traditional AI
+systems that follow fixed rules or make predictions, Generative AI can generate text,
+images, audio, code, and even videos.
+
+Examples of Generative AI include ChatGPT for text generation, DALL·E for image
+creation, and GitHub Copilot for code assistance. These models learn patterns from
+large datasets and use probability to generate new outputs that resemble human-created
+content.
+
+Generative AI is widely used today in education, content creation, healthcare,
+chatbots, and software development because it increases productivity and enables
+automation of creative tasks.
+""",
+
+    "cp2": """
+Large Language Models (LLMs) are a type of Generative AI model trained on massive
+amounts of text data. They learn language patterns, grammar, facts, and reasoning
+abilities using deep neural networks called transformers.
+
+LLMs work by predicting the next word in a sentence based on previous words.
+During training, they process billions of sentences and adjust internal parameters
+to minimize prediction errors. Examples of popular LLMs include GPT (OpenAI),
+LLaMA (Meta), Gemini (Google), and Claude (Anthropic).
+
+LLMs are used in chatbots, document summarization, question answering, translation,
+and code generation. Their performance depends heavily on data quality and model size.
+""",
+
+    "cp5": """
+Generative AI is widely used across industries. In education, it helps with tutoring,
+content generation, and personalized learning. In software development, it assists
+with code generation, debugging, and documentation.
+
+In healthcare, Generative AI supports medical report generation and drug discovery.
+In business, it helps with customer support, marketing content, and data analysis.
+
+Despite its benefits, Generative AI also raises ethical concerns such as data privacy,
+bias, misinformation, and misuse. Responsible AI practices are required to ensure
+safe and ethical usage of these technologies.
+"""
+}
 
 
-def gather_from_web(query: str, k: int = 5) -> List[Document]:
-    if not TAVILY_API_KEY:
-        return []
-
-    search = TavilySearch(max_results=k)
-    results = search.invoke(query)
-
-    docs = []
-    for text in results:
-        if not text:
-            continue
-        docs.append(Document(page_content=text, metadata={"source": "web"}))
-    return docs
-
-
-# app/core/context_gatherer.py
-from typing import List, Tuple
-from langchain_core.documents import Document
-
-# existing helpers: gather_from_notes, gather_from_web must already exist
-
-def gather_context_for_checkpoint(topic: str, objectives: List[str], attempt: int, user_query: str = None) -> Tuple[List[Document], str]:
+def collect_learning_context(checkpoint) -> Tuple[str, str]:
     """
-    When user_query is provided, prefer web results first so free-text queries return web facts.
+    Fetch learning material for a checkpoint.
+    Priority:
+    1. User notes
+    2. LLM-generated explanation
     """
-    canonical_q = f"{topic}. Focus on: " + "; ".join(objectives)
 
-    # If user provided a custom query, prefer web first
-    if user_query and user_query.strip():
-        uq = user_query.strip()
-        if attempt == 1:
-            web_docs = gather_from_web(uq, k=5)
-            if web_docs:
-                return web_docs, "web:user"
-            notes_docs = gather_from_notes(uq, k=5)
-            if notes_docs:
-                return notes_docs, "notes:user"
-            return [], "none"
-        elif attempt == 2:
-            notes_docs = gather_from_notes(uq, k=5)
-            if notes_docs:
-                return notes_docs, "notes:user"
-            web_docs = gather_from_web(uq, k=5)
-            if web_docs:
-                return web_docs, "web:user"
-            return [], "none"
-        else:
-            # mixed: combine web + notes for user query + canonical
-            web_docs = gather_from_web(uq, k=5) + gather_from_web(canonical_q, k=3)
-            notes_docs = gather_from_notes(uq, k=5) + gather_from_notes(canonical_q, k=3)
-            all_docs = web_docs + notes_docs
-            return (all_docs, "mixed:user") if all_docs else ([], "none")
+    # Use local notes if available
+    if checkpoint.id in USER_NOTES:
+        return USER_NOTES[checkpoint.id], "Loaded from local notes"
 
-    # fallback to original (no user_query) behavior
-    query = canonical_q
-    notes_docs = gather_from_notes(query, k=5)
-    if attempt == 1:
-        if notes_docs:
-            return notes_docs, "notes"
-        web_docs = gather_from_web(query, k=5)
-        if web_docs:
-            return web_docs, "web"
-        return [], "none"
-    elif attempt == 2:
-        web_docs = gather_from_web(query, k=5)
-        if web_docs:
-            return web_docs, "web"
-        if notes_docs:
-            return notes_docs, "notes"
-        return [], "none"
-    else:
-        web_docs = gather_from_web(query, k=5)
-        all_docs = (notes_docs or []) + (web_docs or [])
-        if all_docs:
-            return all_docs, "mixed"
-        return [], "none"
+    # Otherwise generate using LLM
+    prompt = f"""
+    Explain the topic '{checkpoint.title}' clearly.
+    Cover these points:
+    {", ".join(checkpoint.goals)}
+    """
 
-
-    # No user_query: original behavior
-    query = canonical_q
-    notes_docs = gather_from_notes(query, k=5)
-    if attempt == 1:
-        if notes_docs:
-            return notes_docs, "notes"
-        web_docs = gather_from_web(query, k=5)
-        if web_docs:
-            return web_docs, "web"
-        return [], "none"
-    elif attempt == 2:
-        web_docs = gather_from_web(query, k=5)
-        if web_docs:
-            return web_docs, "web"
-        if notes_docs:
-            return notes_docs, "notes"
-        return [], "none"
-    else:
-        web_docs = gather_from_web(query, k=5)
-        all_docs = (notes_docs or []) + (web_docs or [])
-        if all_docs:
-            return all_docs, "mixed"
-        return [], "none"
+    content = call_llm(prompt)
+    return content, "Generated using LLM"
