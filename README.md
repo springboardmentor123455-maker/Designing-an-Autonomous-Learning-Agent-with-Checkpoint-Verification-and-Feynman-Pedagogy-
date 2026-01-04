@@ -1,54 +1,119 @@
-# Autonomous Learning Agent with Feynman Pedagogy
+# 🎓 Autonomous Learning Agent
 
-
-## 📖 Project Overview
-This project implements an **Autonomous AI Tutor** designed to guide users through structured learning pathways using **Checkpoint Verification** and **Adaptive Simplification**.
-
-Built on the **LangGraph** framework[cite: 5, 49], the agent operates as a directed cyclic graph that:
-1.  **Ingests Knowledge:** Retrieves context from User Notes or Wikipedia via RAG[cite: 11, 18].
-2.  **Generates Assessments:** Dynamically creates questions based on specific learning checkpoints[cite: 12, 22].
-3.  **Verifies Understanding:** Grades learner answers using vector similarity and LLM-based logic[cite: 12, 23].
-4.  **Adapts (Milestone 3 Focus):** If a learner scores **< 70%**, the agent triggers the **Feynman Pedagogy Module** to re-explain concepts using simple analogies before re-assessing[cite: 13, 25, 105].
+An intelligent tutoring system that provides personalized, structured learning experiences through adaptive checkpoint verification and simplified explanations using the Feynman Technique.
 
 ---
 
-## 🎯 Milestone 3: Feynman Teaching & Adaptive Loop
-**Current Phase: Weeks 5-6** 
+## 🌟 Features
 
-In this milestone, we transitioned from a linear assessment pipeline to a **closed-loop adaptive system**. The agent now possesses "Cognitive Recovery"—it detects failure and intervenes to teach rather than just grade.
+### **Core Capabilities**
 
-### Key Features Implemented:
-* [cite_start]✅ **Conditional Logic & Routing:** implemented the LangGraph router to direct users to the *Pass* state (End) or *Remediation* state based on the strict **70% threshold**[cite: 1, 94].
-* [cite_start]✅ **Feynman Simplification Node:** A dedicated module that identifies knowledge gaps and generates simplified explanations (e.g., using cooking or traffic analogies) for difficult concepts[cite: 105, 109].
-* [cite_start]✅ **Loop-Back Mechanism:** Successfully implemented the feedback loop where the workflow returns to *Question Generation* after remediation to verify the learner's new understanding[cite: 111].
-* [cite_start]✅ **Hybrid Grading Engine:** Enhanced the scoring logic to use a combination of Vector Cosine Similarity, Keyword Matching, and LLM Judgment.
+- **📍 Checkpoint-Based Learning** - Structured progression through 3 sequential learning milestones
+- **🤖 AI-Powered Assessment** - Automated question generation and intelligent answer evaluation
+- **💡 Feynman Technique** - Simplified explanations using analogies when understanding is insufficient
+- **📊 Mastery-Based Progression** - 70% threshold requirement before advancing
+- **📝 Flexible Content Sources** - Uses learner's notes or dynamically retrieves web content
+- **🔄 Adaptive Teaching** - Loop-back mechanism for re-assessment after simplified explanations
+
+### **Technical Highlights**
+
+- **LangGraph State Management** - Graph-based workflow orchestration
+- **Groq LLM Integration** - Ultra-fast inference with Llama 3.3 70B
+- **Real-time Feedback** - Instant scoring and detailed breakdown
+- **User-Friendly Interface** - Clean, responsive web UI
 
 ---
+📚 Usage Guide
+Starting a Learning Session
+Enter your learning topic (e.g., "Machine Learning", "Blockchain")
 
-## ⚙️ System Architecture
-[cite_start]The system logic is defined in `agent_phase_3.py` using **LangGraph** nodes and edges.
+Optionally paste your study materials in the notes field
 
-### Workflow Nodes:
-1.  [cite_start]**`gather_context`**: Checks user notes first; falls back to Wikipedia API if empty.
-2.  [cite_start]**`generate_questions`**: Synthesizes 5 focused questions based on the retrieved context.
-3.  [cite_start]**`audit_questions`**: Self-correction layer that ensures questions are relevant before showing them.
-4.  [cite_start]**`evaluate_learner`**: Interacts with the user, collects answers, and calculates a pass/fail score.
-5.  [cite_start]**`feynman_simplification`**: (Triggered on Fail) Generates a simplified summary using `google/flan-t5-base`.
+Click "Begin Learning Journey"
 
-### State Graph:
-```mermaid
-graph TD
-    A[Start] --> B(Gather Context)
-    B --> C(Generate Questions)
-    C --> D(Audit Questions)
-    D --> E(Evaluate Learner)
-    E -->|Score >= 70%| F[End / Next Checkpoint]
-    E -->|Score < 70%| G(Feynman Simplification)
+Assessment Process
+Read the provided learning content
 
-🛠️ Tech StackLanguage: Python 3.9+ 3Orchestration: langgraph, langchain 4LLM (Local): google/flan-t5-base (via HuggingFace Pipeline) 5Embeddings: sentence-transformers/all-MiniLM-L6-v2 6Vector Store: faiss-cpu 7External Data: wikipedia (API Wrapper) 8🚀 Installation & Usage1. PrerequisitesEnsure you have Python installed.2. Setup EnvironmentBash# Clone the repository
-git clone <repository-url>
-cd <repository-folder>
+Answer all 5 questions thoroughly
 
-# Install dependencies
-pip install -r requirements.txt
-3. Run the Agent 
+Submit for AI evaluation
+
+Review your detailed score breakdown
+
+If Score < 70%
+Click "Get Feynman Explanation" for simplified teaching
+
+Take a new assessment with different questions
+
+Maximum 2 retry attempts per checkpoint
+
+Progression
+Pass checkpoint (≥70%) → Advance to next checkpoint
+
+Complete all 3 checkpoints → Learning path finished!
+
+🛠️ Tech Stack
+Category	Technology
+Backend	Python 3.11+, Flask
+Workflow Engine	LangGraph 0.2.34
+LLM Framework	LangChain 0.3.0
+AI Model	Groq API (Llama 3.3 70B)
+Web Search	Wikipedia API + LLM Fallback
+Frontend	HTML5, CSS3, Vanilla JavaScript
+Text Processing	RecursiveCharacterTextSplitter
+Environment	python-dotenv
+
+
+🔑 Environment Variables
+Variable	Description	Required
+GROQ_API_KEY	Your Groq API key from console.groq.com	✅ Yes
+
+
+🎯 Key Components
+LangGraph State Graph
+The core workflow engine orchestrating:
+
+State management across learning stages
+
+Conditional routing based on assessment scores
+
+Loop-back mechanism for adaptive teaching
+
+Checkpoint System
+Checkpoint 1: Introduction & Fundamentals
+
+Checkpoint 2: Core Concepts & Techniques
+
+Checkpoint 3: Applications & Implementation
+
+Assessment Module
+Generates 5 context-specific questions per checkpoint
+
+Each question scored 0-5 points (25 points total)
+
+70% threshold = 17.5/25 points required
+
+Feynman Teaching
+Activated when score < 70%:
+
+Identifies knowledge gaps
+
+Generates simplified explanations with analogies
+
+Uses 8th-grade vocabulary
+
+Includes emojis for engagement
+
+
+🙏 Acknowledgments
+LangGraph - For the state graph framework
+
+Groq - For ultra-fast LLM inference
+
+Feynman Technique - For the teaching methodology inspiration
+
+Open Source Community - For the amazing tools and libraries
+
+
+👨‍💻 Author
+Nidhin R
