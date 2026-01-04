@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autonomous Learning Agent - Nidhin R</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .app-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 20px 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 3px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .header h1 {
+            font-size: 26px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+            font-weight: 800;
+        }
+        
+        .header p { color: #64748b; font-size: 13px; font-weight: 500; }
+        
+        .main-content {
+            flex: 1;
+            overflow: hidden;
+            padding: 20px;
+        }
+        
+        .content-wrapper {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.3fr 0.7fr;
+            gap: 20px;
+            height: 100%;
+        }
+        
+        .left-panel, .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        .card h2 {
+            color: #1e293b;
+            font-size: 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+        }
+        
+        .note-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .checkpoint-tracker {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .checkpoint-item {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .checkpoint-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            margin: 0 auto 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+            color: #94a3b8;
+            transition: all 0.3s;
+        }
+        
+        .checkpoint-item.completed .checkpoint-circle {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .checkpoint-item.active .checkpoint-circle {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+        }
+        
+        .checkpoint-title {
+            font-size: 10px;
+            font-weight: 600;
+            color: #64748b;
+            line-height: 1.3;
+        }
+        
+        .checkpoint-item.active .checkpoint-title { color: #667eea; }
+        .checkpoint-item.completed .checkpoint-title { color: #10b981; }
+        
+        .input-group { margin-bottom: 14px; }
+        
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+        
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 11px 13px;
+            border: 2px solid #e2e8f0;
+            border-radius: 9px;
+            font-size: 13px;
+            font-family: inherit;
+            transition: border 0.2s;
+        }
+        
+        .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .input-group textarea { 
+            min-height: 80px; 
+            resize: vertical;
+        }
+        
+        .helper-text {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        
+        .btn-warning { background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%); }
+        .btn-success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        
+        .content-box {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            padding: 16px;
+            border-radius: 10px;
+            border-left: 4px solid #3b82f6;
+            max-height: 160px;
+            overflow-y: auto;
+        }
+        
+        .content-box p {
+            color: #1e3a8a;
+            line-height: 1.7;
+            font-size: 13px;
+        }
+        
+        .questions-container {
+            max-height: 420px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+        
+        .question-card {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .question-card h3 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        
+        .question-card p {
+            color: #334155;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        
+        .question-card textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            min-height: 75px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+        }
+        
+        .question-card textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .hidden { display: none !important; }
+        
+        .result-card {
+            padding: 28px;
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+            margin-bottom: 14px;
+        }
+        
+        .result-card.success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .result-card.fail { background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%); }
+        
+        .score-display {
+            font-size: 56px;
+            font-weight: 900;
+            margin: 12px 0;
+        }
+        
+        .score-breakdown {
+            font-size: 16px;
+            opacity: 0.95;
+            margin-top: 8px;
+        }
+        
+        .scores-list {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        
+        .score-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            margin: 8px 0;
+            background: #f8fafc;
+            border-radius: 9px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .score-badge {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 18px;
+            font-weight: 800;
+            font-size: 16px;
+            min-width: 75px;
+            text-align: center;
+        }
+        
+        .teaching-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #f59e0b;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+        
+        .teaching-box h3 { color: #92400e; margin-bottom: 12px; font-size: 16px; }
+        .teaching-box p { color: #78350f; line-height: 1.8; font-size: 13px; white-space: pre-wrap; }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(4px);
+        }
+        
+        .loading-content {
+            background: white;
+            padding: 36px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 380px;
+        }
+        
+        .spinner {
+            border: 5px solid #f3f4f6;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            width: 55px;
+            height: 55px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 18px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .completion-card {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            padding: 44px;
+            border-radius: 16px;
+            text-align: center;
+            color: white;
+        }
+        
+        .completion-card h2 { font-size: 36px; margin-bottom: 14px; }
+        
+        .alert-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 14px;
+            border-radius: 9px;
+            margin-bottom: 14px;
+        }
+        
+        .alert-box strong { color: #92400e; font-size: 14px; }
+        .alert-box p { color: #78350f; margin-top: 6px; font-size: 12px; line-height: 1.5; }
+
+        ::-webkit-scrollbar { width: 7px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        @media (max-width: 1200px) {
+            .content-wrapper { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>🎓 Autonomous Learning Agent</h1>
+            <p>Checkpoint Verification and Feynman Pedagogy by <strong>Nidhin R</strong></p>
+        </div>
+
+        <div class="main-content">
+            <div class="content-wrapper">
+                <div class="left-panel">
+                    <div id="setup-card" class="card">
+                        <h2>🚀 Start Your Learning Journey</h2>
+                        <div class="input-group">
+                            <label>Learning Topic</label>
+                            <input type="text" id="topic-input" placeholder="e.g., Machine Learning, Blockchain, Python" value="Machine Learning">
+                        </div>
+                        <div class="input-group">
+                            <label>Your Study Materials (Optional) <span class="note-badge">✨ Developed by Nidhin</span></label>
+                            <textarea id="notes-input" placeholder="Paste your notes, textbook content, or any study materials here. The system will prioritize your materials for assessment. Leave empty to use web-sourced content."></textarea>
+                            <div class="helper-text">💡 Providing your own notes allows for personalized, context-specific learning</div>
+                        </div>
+                        <button class="btn" onclick="startLearning()">Begin Learning Journey</button>
+                    </div>
+
+                    <div id="content-card" class="card hidden">
+                        <h2 id="checkpoint-title">📍 Checkpoint</h2>
+                        <div class="content-box">
+                            <p id="context-text"></p>
+                        </div>
+                    </div>
+
+                    <div id="questions-card" class="card hidden">
+                        <h2>✍️ Knowledge Assessment</h2>
+                        <p style="color: #64748b; font-size: 12px; margin-bottom: 12px;">Answer all 5 questions based on the learning content above. Minimum 70% required to progress.</p>
+                        <div class="questions-container" id="questions-container"></div>
+                        <button class="btn" id="submit-btn" onclick="submitAnswers()" style="margin-top: 12px;">Submit All Answers</button>
+                    </div>
+                </div>
+
+                <div class="right-panel">
+                    <div id="progress-card" class="card hidden">
+                        <h2>📊 Learning Progress</h2>
+                        <div class="checkpoint-tracker" id="checkpoint-list"></div>
+                    </div>
+
+                    <div id="results-card" class="card hidden">
+                        <div id="results-content"></div>
+                    </div>
+
+                    <div id="action-card" class="card hidden">
+                        <div id="action-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div style="color: #1e293b; font-size: 17px; font-weight: 700; margin-bottom: 8px;" id="loading-text">Processing...</div>
+            <div style="color: #64748b; font-size: 12px;" id="loading-subtext">Please wait</div>
+        </div>
+    </div>
+
+    <script>
+        let sessionId = null;
+        let currentQuestions = [];
+        let allCheckpoints = [];
+        let completedCheckpoints = [];
+        const API = window.location.origin + '/api';
+
+        function showLoading(text, subtext) {
+            document.getElementById('loading-text').textContent = text;
+            document.getElementById('loading-subtext').textContent = subtext;
+            document.getElementById('loading-overlay').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').classList.add('hidden');
+        }
+
+        function updateProgress(checkpoints, currentIdx, completed) {
+            const list = document.getElementById('checkpoint-list');
+            list.innerHTML = '';
+            
+            checkpoints.forEach((cp, idx) => {
+                const isCompleted = completed.includes(cp.title);
+                const isActive = idx === currentIdx;
+                
+                const item = document.createElement('div');
+                item.className = 'checkpoint-item';
+                if (isCompleted) item.classList.add('completed');
+                if (isActive) item.classList.add('active');
+                
+                const emoji = isCompleted ? '✅' : isActive ? '🎯' : (idx + 1);
+                
+                item.innerHTML = `
+                    <div class="checkpoint-circle">${emoji}</div>
+                    <div class="checkpoint-title">${cp.title}</div>
+                `;
+                list.appendChild(item);
+            });
+            
+            document.getElementById('progress-card').classList.remove('hidden');
+        }
+
+        async function startLearning() {
+            const topic = document.getElementById('topic-input').value.trim();
+            if (!topic) { 
+                alert('Please enter a learning topic'); 
+                return; 
+            }
+
+            const notes = document.getElementById('notes-input').value.trim();
+
+            showLoading('Creating Learning Path', 'Generating 3 sequential checkpoints...');
+
+            try {
+                const response = await fetch(`${API}/start`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ topic: topic, notes: notes })
+                });
+
+                const data = await response.json();
+                if (!data.success) throw new Error(data.error);
+
+                sessionId = data.session_id;
+                currentQuestions = data.questions;
+                allCheckpoints = data.all_checkpoints;
+                completedCheckpoints = [];
+
+                hideLoading();
+                document.getElementById('setup-card').classList.add('hidden');
+                updateProgress(allCheckpoints, 0, completedCheckpoints);
+                displayCheckpoint(data);
+            } catch (error) {
+                hideLoading();
+                alert('Error: ' + error.message);
+            }
+        }
+
+        function displayCheckpoint(data) {
+            const cp = data.current_checkpoint;
+            const titleText = `📍 ${cp.title}`;
+            const badge = data.used_user_notes ? '<span class="note-badge">Using Your Notes</span>' : '';
+            
+            document.getElementById('checkpoint-title').innerHTML = titleText + ' ' + badge;
+            document.getElementById('context-text').textContent = data.context;
+            document.getElementById('content-card').classList.remove('hidden');
+
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+
+            data.questions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'question-card';
+                div.innerHTML = `
+                    <h3>Question ${i+1} of 5</h3>
+                    <p>${q}</p>
+                    <textarea id="answer-${i}" placeholder="Type your detailed answer here..." rows="4"></textarea>
+                `;
+                container.appendChild(div);
+            });
+
+            document.getElementById('questions-card').classList.remove('hidden');
+            document.getElementById('results-card').classList.add('hidden');
+            document.getElementById('action-card').classList.add('hidden');
+            document.getElementById('submit-btn').disabled = false;
+        }
+
+        async function submitAnswers() {
+            const answers = [];
+            for (let i = 0; i < currentQuestions.length; i++) {
+                const ans = document.getElementById(`answer-${i}`).value.trim();
+                if (!ans) {
+                    alert(`Please answer Question ${i+1}`);
+                    document.getElementById(`answer-${i}`).focus();
+                    return;
+                }
+                answers.push(ans);
+            }
+
+            document.getElementById('submit-btn').disabled = true;
+            showLoading('Evaluating Your Answers', 'AI is analyzing your responses (5 questions × 5 points = 25 total)');
+
+            try {
+                const response = await fetch(`${API}/evaluate`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ session_id: sessionId, answers: answers })
+                });
+
+                const data = await response.json();
+                if (!data.success) throw new Error(data.error);
+
+                hideLoading();
+                displayResults(data);
+            } catch (error) {
+                hideLoading();
+                alert('Error: ' + error.message);
+                document.getElementById('submit-btn').disabled = false;
+            }
+        }
+
+        function displayResults(data) {
+            const passed = data.passed;
+            
+            let html = `
+                <div class="result-card ${passed ? 'success' : 'fail'}">
+                    <div style="font-size: 52px; margin-bottom: 10px;">${passed ? '🎉' : '💪'}</div>
+                    <h2 style="font-size: 24px; margin-bottom: 10px;">${passed ? 'Checkpoint Passed!' : 'Keep Improving!'}</h2>
+                    <div class="score-display">${data.score.toFixed(1)}%</div>
+                    <div class="score-breakdown">${data.total_points.toFixed(1)}/25 Points</div>
+                    <p style="font-size: 13px; margin-top: 10px; opacity: 0.9;">${passed ? '✅ Ready for next checkpoint' : '⚠️ Need 70% to progress (17.5/25 points)'}</p>
+                </div>
+                
+                <div style="margin-top: 14px;">
+                    <h3 style="color: #1e293b; margin-bottom: 10px; font-size: 15px; font-weight: 700;">Detailed Score Breakdown</h3>
+                    <div class="scores-list">
+            `;
+
+            currentQuestions.forEach((q, i) => {
+                const score = data.scores[i];
+                const emoji = score >= 4.0 ? '✅' : score >= 3.0 ? '⚠️' : '❌';
+                html += `
+                    <div class="score-item">
+                        <div style="font-size: 24px;">${emoji}</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; color: #1e293b; font-size: 13px; margin-bottom: 4px;">Question ${i+1}</div>
+                            <div style="color: #64748b; font-size: 11px; line-height: 1.4;">${q.substring(0, 60)}${q.length > 60 ? '...' : ''}</div>
+                        </div>
+                        <div class="score-badge">${score.toFixed(1)}/5</div>
+                    </div>
+                `;
+            });
+            html += '</div></div>';
+
+            document.getElementById('results-content').innerHTML = html;
+            document.getElementById('results-card').classList.remove('hidden');
+
+            let actionHTML = '';
+            if (passed) {
+                actionHTML = '<button class="btn btn-success" onclick="nextCheckpoint()">➡️ Continue to Next Checkpoint</button>';
+            } else if (data.retry_count < 2) {
+                actionHTML = `
+                    <div class="alert-box">
+                        <strong>⚠️ Score Below 70% Threshold</strong>
+                        <p>Don't worry! Get a simplified explanation using the Feynman Technique to improve your understanding, then take a new assessment.</p>
+                    </div>
+                    <button class="btn btn-warning" onclick="showFeynman()">💡 Get Feynman Explanation</button>
+                `;
+            } else {
+                actionHTML = `
+                    <div class="alert-box">
+                        <strong>📈 Maximum Retries Reached</strong>
+                        <p>You've completed 2 retry attempts. Progressing to the next checkpoint to continue your learning journey.</p>
+                    </div>
+                    <button class="btn btn-success" onclick="nextCheckpoint()">➡️ Continue to Next Checkpoint</button>
+                `;
+            }
+
+            document.getElementById('action-content').innerHTML = actionHTML;
+            document.getElementById('action-card').classList.remove('hidden');
+        }
+
+        async function showFeynman() {
+            showLoading('Generating Feynman Explanation', 'Creating simplified explanation with analogies...');
+
+            try {
+                const response = await fetch(`${API}/feynman`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ session_id: sessionId })
+                });
+
+                const data = await response.json();
+                if (!data.success) throw new Error('Failed');
+
+                hideLoading();
+
+                const html = `
+                    <div class="teaching-box">
+                        <h3>💡 Simplified Explanation (Feynman Technique)</h3>
+                        <p>${data.explanation}</p>
+                    </div>
+                    <button class="btn" onclick="requestRetest()" style="margin-top: 14px;">🔄 Take New Assessment</button>
+                `;
+
+                document.getElementById('action-content').innerHTML = html;
+            } catch (error) {
+                hideLoading();
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function requestRetest() {
+            showLoading('Preparing Retest', 'Generating new set of questions...');
+
+            try {
+                const response = await fetch(`${API}/retest`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ session_id: sessionId })
+                });
+
+                const data = await response.json();
+                if (!data.success) throw new Error('Failed');
+
+                hideLoading();
+                currentQuestions = data.questions;
+
+                const container = document.getElementById('questions-container');
+                container.innerHTML = '';
+
+                data.questions.forEach((q, i) => {
+                    const div = document.createElement('div');
+                    div.className = 'question-card';
+                    div.innerHTML = `
+                        <h3>Question ${i+1} of 5</h3>
+                        <p>${q}</p>
+                        <textarea id="answer-${i}" placeholder="Type your detailed answer here..." rows="4"></textarea>
+                    `;
+                    container.appendChild(div);
+                });
+
+                document.getElementById('results-card').classList.add('hidden');
+                document.getElementById('action-card').classList.add('hidden');
+                document.getElementById('submit-btn').disabled = false;
+            } catch (error) {
+                hideLoading();
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function nextCheckpoint() {
+            showLoading('Loading Next Checkpoint', 'Preparing new content and questions...');
+
+            try {
+                const response = await fetch(`${API}/next-checkpoint`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ session_id: sessionId })
+                });
+
+                const data = await response.json();
+                if (!data.success) throw new Error('Failed');
+
+                hideLoading();
+
+                if (data.all_complete) {
+                    const html = `
+                        <div class="completion-card">
+                            <div style="font-size: 72px; margin-bottom: 14px;">🎉</div>
+                            <h2>All Checkpoints Complete!</h2>
+                            <p style="font-size: 15px; margin: 14px 0; opacity: 0.95;">Congratulations! You've mastered all 3 checkpoints:<br><strong>${data.completed_checkpoints.join(', ')}</strong></p>
+                            <button class="btn" onclick="location.reload()" style="margin-top: 20px; width: auto; padding: 12px 36px;">🔄 Start New Topic</button>
+                        </div>
+                    `;
+                    document.getElementById('results-content').innerHTML = html;
+                    document.getElementById('action-card').classList.add('hidden');
+                } else {
+                    allCheckpoints = data.all_checkpoints;
+                    currentQuestions = data.questions;
+                    const currentIdx = allCheckpoints.findIndex(cp => !cp.completed);
+                    updateProgress(allCheckpoints, currentIdx, allCheckpoints.filter(cp => cp.completed).map(cp => cp.title));
+                    displayCheckpoint(data);
+                }
+            } catch (error) {
+                hideLoading();
+                alert('Error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
