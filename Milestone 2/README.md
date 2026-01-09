@@ -41,17 +41,18 @@ The agent operates on a cyclic graph architecture to ensure mastery:
 
 ```mermaid
 graph TD
-    A[Start: User Input] --> B{Check: User PDF?}
-    B -- Yes --> C[Process PDF (FAISS)]
-    B -- No --> D[Web Search (DuckDuckGo)]
-    C --> E[Generate Lesson (No-Math)]
+    A["Start: User Input"] --> B{"Check: User PDF?"}
+    B -- Yes --> C["Process PDF (FAISS)"]
+    B -- No --> D["Web Search (DuckDuckGo)"]
+    C --> E["Generate Lesson (No-Math)"]
     D --> E
-    E --> F[Generate Quiz]
-    F --> G[User Takes Quiz]
-    G --> H[Strict Grading Node]
-    H --> I{Score > 70%?}
-    I -- Yes --> J[Pass & End]
+    E --> F["Generate Quiz"]
+    F --> G["User Takes Quiz"]
+    G --> H["Strict Grading Node"]
+    H --> I{"Score > 70%?"}
+    I -- Yes --> J["Pass & End"]
     I -- No --> E
+```
 
 🛠️ Tech Stack
 Language: Python
@@ -71,18 +72,28 @@ Frontend: Streamlit
 ⚙️ Setup & Installation
 1. Clone the Repository
 
+```bash
 git clone [https://github.com/yourusername/autonomous-ai-tutor.git](https://github.com/yourusername/autonomous-ai-tutor.git)
 cd autonomous-ai-tutor
+```
 
 2. Install Dependencies
 
+```bash
 pip install langchain langchain-huggingface langchain-community chromadb faiss-cpu duckduckgo-search streamlit
+```
 
 🖥️ Usage Guide
 1. Running the Web Tutor (Frontend)
 To launch the interactive application where you can upload notes and take quizzes:
+
+```bash
 streamlit run app.py
+```
 
 2. Running the Backend Logic
 To inspect the internal LangGraph thought process:
+
+```bash
 jupyter notebook "Milestone 2.ipynb"
+```
