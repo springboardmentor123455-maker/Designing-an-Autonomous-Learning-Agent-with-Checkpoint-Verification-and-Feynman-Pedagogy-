@@ -1,114 +1,75 @@
-Autonomous AI Tutor (Milestone 2)
-An intelligent, autonomous study assistant built with LangGraph and Hugging Face. This agent creates personalized study guides, generates conceptual quizzes, and rigorously grades student answers using a "Strict Examiner" persona.
+# Autonomous AI Tutor with Checkpoint Verification & Feynman Pedagogy
 
-Key Features
-Smart RAG (Retrieval-Augmented Generation):
+## 📌 Project Overview
+[cite_start]This project implements an **Autonomous Learning Agent** designed to provide a personalized, structured tutoring experience[cite: 69, 70]. The agent utilizes **Retrieval-Augmented Generation (RAG)** to teach complex technical topics, strictly enforcing mastery before allowing the learner to progress.
 
-First checks your uploaded PDF Notes for relevant content.
+[cite_start]The system combines **LangChain** for logic orchestration and **Streamlit** for the user interface, aiming to solve the problem of passive learning by implementing active recall and rigorous assessment[cite: 74, 76].
 
-If notes are insufficient or missing, it automatically falls back to Web Search (DuckDuckGo) to ensure comprehensive lessons.
+## 📂 Repository Structure: Understanding the Files
 
-Automated Lesson Generation:
+This repository contains two core components that demonstrate the project's evolution from logic design to user interface integration.
 
-Writes detailed 750-1000 word technical guides.
+### 1. `Milestone 2.ipynb` (The Backend Logic Core)
+**Role:** Development, Logic Testing, and Graph Architecture.
+* [cite_start]**Technology:** Implements **LangGraph** (`StateGraph`) to orchestrate the learning workflow[cite: 111].
+* **Functionality:**
+    * Defines the agent's nodes: Document Processing, Web Search, Essay Generation, Validation, and Grading.
+    * [cite_start]Contains the retry logic and state management for the "Learning Feedback Loop"[cite: 102].
+    * Used for rigorously testing the "no-math" generation prompts and strict grading rubrics.
+    * [cite_start]Demonstrates the "Context Gathering" and "Initial Verification" milestones[cite: 132, 149].
 
-"No Math" Mode: Explains complex formulas using only plain English narratives (Zero LaTeX/Equations).
+### 2. `app.py` (The Interactive User Interface)
+**Role:** Frontend Application and End-to-End Integration.
+* **Technology:** **Streamlit** (Python web framework).
+* **Functionality:**
+    * [cite_start]A port of the backend logic into a user-friendly web interface[cite: 120].
+    * Allows users to upload PDF notes, select topics (e.g., CNNs, Transformers), and take interactive quizzes.
+    * Visualizes the progression from "Study Mode" to "Quiz Mode" to "Result Grading."
+    * [cite_start]Fulfills the project requirement for a "Learner Interface"[cite: 120].
 
-Adaptive Quizzing:
+---
 
-Generates 3-5 conceptual questions based specifically on the generated lesson.
+## 🚀 Key Features
 
-Ensures questions focus on "Why" and "How" rather than rote calculation.
+* [cite_start]**Dynamic Context Gathering:** Prioritizes user-uploaded PDFs (Lecture Notes) and falls back to autonomous Web Search (DuckDuckGo) if notes are insufficient[cite: 80].
+* **Strict "No-Math" Explanations:** The agent is prompted to explain complex mathematical concepts (like Backpropagation) using purely narrative, conceptual English, ensuring accessibility.
+* **Checkpoint Verification:**
+    * [cite_start]Generates 3-5 conceptual questions based on the generated material[cite: 154].
+    * Grades answers on a strict rubric (0-100 scale).
+    * [cite_start]Requires a passing score (e.g., >70%) to consider the topic mastered[cite: 74, 116].
+* **Grading & Feedback:** Provides specific, corrective feedback for every answer, explaining *why* an answer was right or wrong.
 
-Rigorous Grading System:
+## 🛠️ Tech Stack
 
-Strict Examiner Persona: Penalizes vague answers and lack of technical keywords.
+* [cite_start]**Language:** Python [cite: 122]
+* [cite_start]**Orchestration:** LangChain & LangGraph [cite: 123, 124]
+* [cite_start]**LLM Engine:** HuggingFace Endpoint (Qwen/Qwen2.5-72B-Instruct) [cite: 125]
+* [cite_start]**Embeddings:** Sentence-Transformers (`all-MiniLM-L6-v2`) [cite: 127]
+* [cite_start]**Vector Store:** FAISS (for document chunking and retrieval) [cite: 129]
+* [cite_start]**Search Tool:** DuckDuckGo Search API [cite: 126]
+* **Frontend:** Streamlit
 
-Detailed Feedback: Provides line-by-line critique and specific reasoning for every score.
+## ⚙️ Setup & Installation
 
-Score Tracking: Auto-calculates final scores (Pass/Fail threshold: 80%).
+1.  **Clone the Repository**
+    ```bash
+    git clone [https://github.com/yourusername/autonomous-ai-tutor.git](https://github.com/yourusername/autonomous-ai-tutor.git)
+    cd autonomous-ai-tutor
+    ```
 
-Observability: Integrated with LangSmith for real-time tracing of agent thoughts and latency.
+2.  **Install Dependencies**
+    ```bash
+    pip install langchain langchain-huggingface langchain-community chromadb faiss-cpu duckduckgo-search streamlit
+    ```
 
-Tech Stack
-Orchestration: LangChain, LangGraph
+3.  **Environment Variables**
+    You must provide a Hugging Face API Token.
+    * *Option A:* Create a `.env` file.
+    * *Option B:* Enter the token directly in the `app.py` sidebar when running.
 
-LLM: Qwen 2.5-72B-Instruct (via Hugging Face API)
+## 🖥️ Usage Guide
 
-Embeddings: Sentence-Transformers (all-MiniLM-L6-v2)
-
-Vector Store: FAISS
-
-Search: DuckDuckGo Search Tool
-
-Frontend: Streamlit (or Python Notebook Interface)
-
-Project Structure
-Bash
-
-├── app.py               # Main application logic (Streamlit/Python)
-├── notes.pdf            # (Optional) User uploadable study notes
-├── requirements.txt     # Python dependencies
-└── README.md            # Project documentation
-⚙️ Setup & Installation
-1. Clone the Repository
-Bash
-
-git clone https://github.com/YOUR_USERNAME/ai-tutor-milestone-2.git
-cd ai-tutor-milestone-2
-2. Install Dependencies
-Bash
-
-pip install -r requirements.txt
-(Ensure you have langchain, langgraph, streamlit, faiss-cpu, huggingface_hub installed)
-
-3. Configure API Keys
-You need a Hugging Face Token to run the LLM.
-
-Create a .env file or export it in your terminal:
-
-Bash
-
-export HUGGINGFACEHUB_API_TOKEN="hf_your_token_here"
-(Optional) For LangSmith tracing:
-
-Bash
-
-export LANGCHAIN_TRACING_V2="true"
-export LANGCHAIN_API_KEY="ls_your_key_here"
-How to Run
-Option A: Streamlit UI (Recommended)
-Bash
-
+### To Run the Interactive App:
+Execute the Streamlit application to use the full UI.
+```bash
 streamlit run app.py
-Open the local URL provided (usually http://localhost:8501).
-
-Enter your Hugging Face Token in the sidebar.
-
-Select a topic (e.g., "CNNs", "GANs") or upload a PDF.
-
-Click "Generate Study Material".
-
-Option B: Jupyter Notebook
-If using the .ipynb version, simply Run All Cells in order. The interaction will happen inside the output cells.
-
-System Workflow (The "Graph")
-The agent follows a strict logic flow managed by LangGraph:
-
-Start: User selects a topic (e.g., "Backpropagation").
-
-Check PDF: The agent searches notes.pdf.
-
-Decision: Is the content relevant?
-
-YES: Use PDF content.
-
-NO: Trigger Web Search to find external info.
-
-Generate: The LLM writes a 1000-word lesson (Plain English only).
-
-Quiz: The LLM generates 5 conceptual questions.
-
-User Input: Student types answers.
-
-Grade: The "Strict Examiner" compares answers against the generated lesson and assigns a score (0-100).
