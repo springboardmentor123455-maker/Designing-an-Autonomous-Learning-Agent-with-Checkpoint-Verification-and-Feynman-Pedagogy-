@@ -42,16 +42,16 @@ The agent operates on a cyclic graph architecture to ensure mastery:
 ```mermaid
 graph TD
     A["Start: User Input"] --> B{"Check: User PDF?"}
-    B -- Yes --> C["Process PDF (FAISS)"]
-    B -- No --> D["Web Search (DuckDuckGo)"]
+    B -->|Yes| C["Process PDF (FAISS)"]
+    B -->|No| D["Web Search (DuckDuckGo)"]
     C --> E["Generate Lesson (No-Math)"]
     D --> E
     E --> F["Generate Quiz"]
     F --> G["User Takes Quiz"]
     G --> H["Strict Grading Node"]
     H --> I{"Score > 70%?"}
-    I -- Yes --> J["Pass & End"]
-    I -- No --> E
+    I -->|Yes| J["Pass & End"]
+    I -->|No| E
 ```
 
 🛠️ Tech Stack
