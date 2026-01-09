@@ -91,17 +91,24 @@ This document contains lecture notes on **Deep Learning Concepts**, which the AI
 * API Keys: Groq, LangSmith (Optional)
 
 **Installation:**
-```bash
+
 # 1. Clone the repository
+```bash
 git clone [https://github.com/your-username/ai-tutor-pro.git](https://github.com/your-username/ai-tutor-pro.git)
+```
 
 # 2. Install dependencies
+```bash
 pip install streamlit langchain-groq langchain-huggingface langchain-community pypdf duckduckgo-search
+```
 
 # 3. Run the application
-streamlit run app.py
 
+```bash
+streamlit run app.py
+```
 ## 🖥️ Usage Guide
+
 1. **Configuration:** Enter your Groq API Key in the sidebar.
 
 2. **Upload Context:** Upload notes.pdf (or any educational PDF) to the sidebar.
