@@ -28,15 +28,6 @@ graph TD
     J -- Score < 70% --> L[FAIL: Feynman Remedial Node]
     L --> G
 ```
-## 📂 Repository Structure
-
-```text
-.
-├── app.py                # The Production Frontend (Streamlit)
-├── Milestone 3&4.ipynb   # The Backend Logic & Research Lab (LangGraph)
-├── notes.pdf             # Sample Knowledge Base (Deep Learning)
-└── README.md             # Project Documentation
-```
 
 ## 📂 File Documentation
 
