@@ -55,19 +55,6 @@ This notebook contains the **LangGraph** implementation, demonstrating the compl
 * **Strict Grading Node (Cell 14):** Implements the logic to penalize vague answers and identify specific "failed concepts" for remediation.
 * **LangGraph Workflow (Cell 10 & 17):** Compiles the state graph (`StateGraph`) with conditional edges that determine whether to Pass, Fail, Retry, or Search.
 
-### 3. `notes.pdf` (Sample Knowledge Base)
-**Role:** The ground-truth dataset for testing the RAG capabilities.
-This document contains lecture notes on **Deep Learning Concepts**, which the AI uses to generate lessons and quizzes.
-
-**Covered Topics (Knowledge Graph):**
-1.  **Artificial Neural Networks (ANN):** Explains Input, Hidden, and Output layers, alongside Forward Propagation and Backpropagation.
-2.  **Convolutional Neural Networks (CNN):** Details filters (kernels), pooling layers (Max Pooling), and their use in computer vision.
-3.  **Recurrent Neural Networks (RNN):** Describes networks with "memory loops" designed for sequential data like speech recognition.
-4.  **Generative Adversarial Networks (GAN):** Explains the dynamic between the **Generator** (creates fake data) and the **Discriminator** (detects fakes).
-5.  **Transformers:** (Mentioned as the final topic in the notes).
-
----
-
 ## 🚀 Key Features
 1. **Hybrid RAG:** Intelligently switches between User Documents and DuckDuckGo Web Search.
 
