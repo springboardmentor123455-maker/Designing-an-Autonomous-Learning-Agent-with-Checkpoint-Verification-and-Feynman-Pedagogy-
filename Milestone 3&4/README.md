@@ -30,11 +30,13 @@ graph TD
 ```
 ## 📂 Repository Structure
 
+```text
 .
 ├── app.py                # The Production Frontend (Streamlit)
 ├── Milestone 3&4.ipynb   # The Backend Logic & Research Lab (LangGraph)
 ├── notes.pdf             # Sample Knowledge Base (Deep Learning)
 └── README.md             # Project Documentation
+```
 
 ## 📂 File Documentation
 
