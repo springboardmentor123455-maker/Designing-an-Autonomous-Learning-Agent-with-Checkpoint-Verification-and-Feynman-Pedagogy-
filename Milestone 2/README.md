@@ -1,75 +1,88 @@
-# Autonomous AI Tutor with Checkpoint Verification & Feynman Pedagogy
+# Autonomous AI Tutor: Checkpoint Verification & Feynman Pedagogy
 
 ## 📌 Project Overview
-[cite_start]This project implements an **Autonomous Learning Agent** designed to provide a personalized, structured tutoring experience[cite: 69, 70]. The agent utilizes **Retrieval-Augmented Generation (RAG)** to teach complex technical topics, strictly enforcing mastery before allowing the learner to progress.
+This project implements an **Autonomous Learning Agent** designed to provide a structured, personalized tutoring experience. Unlike standard chatbots, this agent enforces a strict "Mastery-Based Progression" system. It utilizes **Retrieval-Augmented Generation (RAG)** to teach complex technical concepts and rigorously verifies user understanding through generated quizzes before allowing them to advance.
 
-[cite_start]The system combines **LangChain** for logic orchestration and **Streamlit** for the user interface, aiming to solve the problem of passive learning by implementing active recall and rigorous assessment[cite: 74, 76].
+The system is built using **LangGraph** for workflow orchestration and **Streamlit** for the interactive user interface.
 
-## 📂 Repository Structure: Understanding the Files
+## 📂 Repository Structure
 
-This repository contains two core components that demonstrate the project's evolution from logic design to user interface integration.
+This repository contains two core components representing the logic and the interface of the agent:
 
-### 1. `Milestone 2.ipynb` (The Backend Logic Core)
-**Role:** Development, Logic Testing, and Graph Architecture.
-* [cite_start]**Technology:** Implements **LangGraph** (`StateGraph`) to orchestrate the learning workflow[cite: 111].
-* **Functionality:**
-    * Defines the agent's nodes: Document Processing, Web Search, Essay Generation, Validation, and Grading.
-    * [cite_start]Contains the retry logic and state management for the "Learning Feedback Loop"[cite: 102].
-    * Used for rigorously testing the "no-math" generation prompts and strict grading rubrics.
-    * [cite_start]Demonstrates the "Context Gathering" and "Initial Verification" milestones[cite: 132, 149].
+### 1. `Milestone 2.ipynb` (Backend Logic & Research)
+* **Purpose:** The core development environment for the agent's logic.
+* **Key Tech:** Implements the **LangGraph StateGraph** to orchestrate the cyclic workflow (Search → Generate → Quiz → Grade → Retry).
+* **Functionality:** Contains the prompt engineering for "No-Math" explanations and the strict grading algorithms used to evaluate student answers.
 
-### 2. `app.py` (The Interactive User Interface)
-**Role:** Frontend Application and End-to-End Integration.
-* **Technology:** **Streamlit** (Python web framework).
-* **Functionality:**
-    * [cite_start]A port of the backend logic into a user-friendly web interface[cite: 120].
-    * Allows users to upload PDF notes, select topics (e.g., CNNs, Transformers), and take interactive quizzes.
-    * Visualizes the progression from "Study Mode" to "Quiz Mode" to "Result Grading."
-    * [cite_start]Fulfills the project requirement for a "Learner Interface"[cite: 120].
+### 2. `app.py` (Frontend Application)
+* **Purpose:** The production-ready user interface.
+* **Key Tech:** **Streamlit**.
+* **Functionality:** A web-based port of the backend logic that allows users to:
+    * Upload lecture notes (PDF).
+    * Select learning topics (e.g., CNNs, RAG, Transformers).
+    * Read generated study guides.
+    * Take interactive quizzes with real-time AI grading.
 
 ---
 
 ## 🚀 Key Features
 
-* [cite_start]**Dynamic Context Gathering:** Prioritizes user-uploaded PDFs (Lecture Notes) and falls back to autonomous Web Search (DuckDuckGo) if notes are insufficient[cite: 80].
-* **Strict "No-Math" Explanations:** The agent is prompted to explain complex mathematical concepts (like Backpropagation) using purely narrative, conceptual English, ensuring accessibility.
-* **Checkpoint Verification:**
-    * [cite_start]Generates 3-5 conceptual questions based on the generated material[cite: 154].
-    * Grades answers on a strict rubric (0-100 scale).
-    * [cite_start]Requires a passing score (e.g., >70%) to consider the topic mastered[cite: 74, 116].
-* **Grading & Feedback:** Provides specific, corrective feedback for every answer, explaining *why* an answer was right or wrong.
+* **Adaptive Context Gathering:** The agent prioritizes user-uploaded documents (PDFs) to tailor the lesson. If no documents are provided, it autonomously performs a **DuckDuckGo Web Search** to gather accurate technical details.
+* **"No-Math" Conceptual Explanations:** The AI is strictly prompted to explain complex mathematical relationships (like Backpropagation gradients) using purely narrative, descriptive English to ensure accessibility.
+* **Rigorous Assessment:**
+    * Generates 3-5 conceptual questions based on the specific lesson content.
+    * **Strict Grading:** Answers are graded on a 0-100 scale. Generic or vague answers are penalized.
+    * **Threshold:** A score of **70%** is required to pass the checkpoint.
+* **Feedback Loop:** The system provides detailed, corrective feedback for every question, explaining exactly why an answer was correct or incorrect.
 
-## 🛠️ Tech Stack
+## 🏗️ System Architecture
 
-* [cite_start]**Language:** Python [cite: 122]
-* [cite_start]**Orchestration:** LangChain & LangGraph [cite: 123, 124]
-* [cite_start]**LLM Engine:** HuggingFace Endpoint (Qwen/Qwen2.5-72B-Instruct) [cite: 125]
-* [cite_start]**Embeddings:** Sentence-Transformers (`all-MiniLM-L6-v2`) [cite: 127]
-* [cite_start]**Vector Store:** FAISS (for document chunking and retrieval) [cite: 129]
-* [cite_start]**Search Tool:** DuckDuckGo Search API [cite: 126]
-* **Frontend:** Streamlit
+The agent operates on a cyclic graph architecture to ensure mastery:
 
-## ⚙️ Setup & Installation
+```mermaid
+graph TD
+    A[Start: User Input] --> B{Check: User PDF?}
+    B -- Yes --> C[Process PDF (FAISS)]
+    B -- No --> D[Web Search (DuckDuckGo)]
+    C --> E[Generate Lesson (No-Math)]
+    D --> E
+    E --> F[Generate Quiz]
+    F --> G[User Takes Quiz]
+    G --> H[Strict Grading Node]
+    H --> I{Score > 70%?}
+    I -- Yes --> J[Pass & End]
+    I -- No --> E
 
-1.  **Clone the Repository**
-    ```bash
-    git clone [https://github.com/yourusername/autonomous-ai-tutor.git](https://github.com/yourusername/autonomous-ai-tutor.git)
-    cd autonomous-ai-tutor
-    ```
+🛠️ Tech Stack
+Language: Python
 
-2.  **Install Dependencies**
-    ```bash
-    pip install langchain langchain-huggingface langchain-community chromadb faiss-cpu duckduckgo-search streamlit
-    ```
+Orchestration: LangChain & LangGraph
 
-3.  **Environment Variables**
-    You must provide a Hugging Face API Token.
-    * *Option A:* Create a `.env` file.
-    * *Option B:* Enter the token directly in the `app.py` sidebar when running.
+LLM Engine: HuggingFace Endpoint (Qwen/Qwen2.5-72B-Instruct)
 
-## 🖥️ Usage Guide
+Embeddings: Sentence-Transformers (all-MiniLM-L6-v2)
 
-### To Run the Interactive App:
-Execute the Streamlit application to use the full UI.
-```bash
+Vector Store: FAISS (for efficient document chunking and retrieval)
+
+Search Tool: DuckDuckGo Search API
+
+Frontend: Streamlit
+
+⚙️ Setup & Installation
+1. Clone the Repository
+
+git clone [https://github.com/yourusername/autonomous-ai-tutor.git](https://github.com/yourusername/autonomous-ai-tutor.git)
+cd autonomous-ai-tutor
+
+2. Install Dependencies
+
+pip install langchain langchain-huggingface langchain-community chromadb faiss-cpu duckduckgo-search streamlit
+
+🖥️ Usage Guide
+1. Running the Web Tutor (Frontend)
+To launch the interactive application where you can upload notes and take quizzes:
 streamlit run app.py
+
+2. Running the Backend Logic
+To inspect the internal LangGraph thought process:
+jupyter notebook "Milestone 2.ipynb"
