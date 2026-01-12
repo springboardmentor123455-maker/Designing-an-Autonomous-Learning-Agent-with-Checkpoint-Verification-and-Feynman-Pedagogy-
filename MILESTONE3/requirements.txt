@@ -1,0 +1,7 @@
+streamlit
+langgraph
+langchain-groq
+tavily-python
+python-dotenv
+sentence-transformers
+scikit-learn
