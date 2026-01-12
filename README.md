@@ -240,7 +240,7 @@ cd Designing-an-Autonomous-Learning-Agent-with-Checkpoint-Verification-and-Feynm
 │   └── utils/                 # Utility functions
 │
 └── tests/                     # Test scripts
-
+```bash
 
 📈 Educational Impact
 
