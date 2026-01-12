@@ -240,7 +240,7 @@ cd Designing-an-Autonomous-Learning-Agent-with-Checkpoint-Verification-and-Feynm
 │   └── utils/                 # Utility functions
 │
 └── tests/                     # Test scripts
-```bash
+```
 
 📈 Educational Impact
 
@@ -269,3 +269,6 @@ Richard Feynman – Teaching methodology inspiration
 # 🎯 Conclusion
 
 The Autonomous Learning Agent demonstrates how agentic AI systems can be applied to education to create mastery-driven, adaptive learning experiences through checkpoint verification and simplified teaching strategies.
+
+**Credits and Author:**
+--Suwetha K
