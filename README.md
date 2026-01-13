@@ -1,10 +1,10 @@
-# Neural Networks Study System
+# AI & Machine Learning Study System
 
-An intelligent AI-powered learning system that helps you understand neural network concepts step-by-step. This project uses advanced AI technology to create personalized quizzes, provide simplified explanations, and track your learning progress.
+An intelligent AI-powered learning system that helps you understand AI and Machine Learning concepts step-by-step. This project uses advanced AI technology to create personalized quizzes, provide simplified explanations, and track your learning progress.
 
 ## What is This Project?
 
-This is a complete educational application that teaches you about Neural Networks in an interactive way. Think of it as your personal AI tutor that:
+This is a complete educational application that teaches you about Artificial Intelligence and Machine Learning in an interactive way. Think of it as your personal AI tutor that:
 - Gives you study material automatically
 - Creates quiz questions to test your understanding
 - Explains difficult concepts in very simple language (like explaining to a 10-year-old)
@@ -40,23 +40,24 @@ This is a complete educational application that teaches you about Neural Network
 
 ## Topics Covered (Checkpoints)
 
-1. **Basics of Neural Networks** - Learn about neurons, weights, bias, and activation functions
-2. **Forward Propagation** - Understand how data moves through network layers
-3. **Loss Function** - Know how to measure model performance and accuracy
-4. **Backpropagation** - Learn how errors propagate backward to update weights
-5. **Gradient Descent Optimization** - Understand how neural networks learn through optimization
-6. **Regularization Techniques** - Prevent overfitting with L1, L2, and dropout methods
+1. **Artificial Intelligence** - Learn what AI is, how it differs from normal programs, and see real-world examples
+2. **Machine Learning** - Understand ML fundamentals, supervised vs unsupervised learning, and training data
+3. **Generative AI** - Explore GenAI tools like ChatGPT and DALL-E, and understand content creation
+4. **Large Language Models** - Learn about LLMs, how they understand text, and popular examples
+5. **Prompt Engineering** - Master the art of writing effective prompts for AI models
+6. **AI Ethics and Safety** - Understand ethical concerns, AI bias, fairness, and responsible AI use
 
 ## Technology Used
 
 - **Python 3.13** - Programming language
 - **Streamlit** - For creating beautiful web interface
-- **Hugging Face Inference API** - Cloud-based LLM for generating questions and explanations
+- **Hugging Face Inference API** - Cloud-based LLM for generating questions and explanations (via huggingface_hub)
 - **LangSmith** - For tracing and monitoring LLM calls (observability)
 - **FAISS Vector Database** - For storing and searching study material efficiently
 - **Tavily API** - For searching relevant information from the web
 - **LangChain** - For processing text and managing AI workflows
 - **Sentence Transformers** - For generating text embeddings
+- **PyTorch & Transformers** - For deep learning model support
 
 ## How to Install and Run
 
@@ -91,7 +92,7 @@ LANGSMITH_PROJECT=AI-Study-System
 ### Step 3: Run the Application
 Open your terminal/command prompt in the project folder and type:
 ```bash
-streamlit run app.py
+streamlit run infosys.py
 ```
 
 The application will open automatically in your web browser!
@@ -111,9 +112,9 @@ The application will open automatically in your web browser!
    - Click "Start Quiz" when you feel ready
 
 3. **Take the Quiz**
-   - You will get 2 questions about the topic
+   - You will get 6 questions about the topic
    - Type your answers in the text box
-   - Click "Get Hint" if you need help
+   - Click "Get Hint" if you need help (hints are generated from study material)
    - Click "Submit Quiz" when done
 
 4. **Check Your Score**
@@ -132,7 +133,7 @@ The application will open automatically in your web browser!
 
 ## Project Files Explanation
 
-- `app.py` - Main application with Hugging Face Inference API
+- `infosys.py` - Main application with Hugging Face Inference API
 - `.env` - Contains your API keys (keep this secret!)
 - `README.md` - This instruction file
 - `requirements.txt` - Python package dependencies
@@ -161,12 +162,13 @@ Score ≥ 70%? → Yes: Move to Next Checkpoint
 
 3. **Question Generation (Milestone 2)**
    - AI model reads study material
-   - Creates 2 relevant questions automatically
+   - Creates 6 relevant questions automatically based on checkpoint objectives
    - Questions are saved for the quiz
 
 4. **Answer Grading (Milestone 2 & 3)**
    - Checks if your answer contains important keywords
-   - Gives points based on word count and relevant terms
+   - Gives points based on word count (10+ words gets 0.3 points)
+   - Topic-specific keyword matching (AI, ML, GenAI, LLM, etc.)
    - Identifies weak areas (questions with score < 70%)
 
 5. **Feynman Teaching (Milestone 3)**
@@ -178,11 +180,3 @@ Score ≥ 70%? → Yes: Move to Next Checkpoint
    - Tracks completed checkpoints
    - Remembers retry count for each checkpoint
    - Guides you through sequential learning path
-
----
-
-## Website
-
-Url: **[https://ai-study-system-feynman.streamlit.app/](https://ai-study-system-feynman.streamlit.app/)**
-
----
