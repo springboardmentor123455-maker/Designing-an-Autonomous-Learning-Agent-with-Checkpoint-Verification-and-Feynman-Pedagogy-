@@ -28,17 +28,8 @@ from langchain_core.documents import Document
 # Secrets helper: read from Streamlit secrets and environment fallbacks
 def get_secret_value(name: str, alt_names=None, default: str = "") -> str:
     alt_names = alt_names or []
-    # 1) Streamlit Secrets
-    try:
-        if "st" in globals() and hasattr(st, "secrets"):
-            if name in st.secrets:
-                return str(st.secrets[name])
-            for alt in alt_names:
-                if alt in st.secrets:
-                    return str(st.secrets[alt])
-    except Exception:
-        pass
-    # 2) Environment variables
+    
+    # 1) Try Environment variables First
     val = os.getenv(name)
     if val:
         return val
@@ -46,10 +37,25 @@ def get_secret_value(name: str, alt_names=None, default: str = "") -> str:
         val = os.getenv(alt)
         if val:
             return val
+    
+    # 2) Try Streamlit Secrets
+    try:
+        import streamlit as st
+        if hasattr(st, "secrets") and len(st.secrets) > 0:
+            if name in st.secrets:
+                return str(st.secrets[name])
+            for alt in alt_names:
+                if alt in st.secrets:
+                    return str(st.secrets[alt])
+    except (FileNotFoundError, AttributeError, KeyError):
+        pass
+    except Exception:
+        pass
+    
     return default
 
 # Page config
-st.set_page_config(page_title="Neural Networks Study System", page_icon="NN", layout="wide")
+st.set_page_config(page_title="AI-Powered Study System", layout="wide")
 
 # MILESTONE 1: CHECKPOINT STRUCTURE & CONTEXT GATHERING
 @dataclass
@@ -63,54 +69,56 @@ class Checkpoint:
 CHECKPOINTS: List[Checkpoint] = [
     Checkpoint(
         id="cp1",
-        topic="Basics of Neural Networks",
+        topic="Artificial Intelligence",
         objectives=[
-            "Explain what a neuron is in a neural network",
-            "Describe how weights and bias affect the output",
-            "Define an activation function and its purpose",
+            "What is Artificial Intelligence and how is it different from normal programs?",
+            "Give examples of AI in everyday life",
+            "Explain the difference between AI, ML, and Deep Learning"
         ]
     ),
     Checkpoint(
         id="cp2",
-        topic="Forward Propagation",
+        topic="Machine Learning",
         objectives=[
-            "How input data go through all the layers?",
-            "Calculate output for simple 2-layer network?"
+            "What is Machine Learning and how does it work?",
+            "Explain supervised and unsupervised learning with examples",
+            "What are training data and testing data?"
         ]
     ),
     Checkpoint(
         id="cp3",
-        topic="Loss Function",
+        topic="Generative AI",
         objectives=[
-            "What loss function actually measure?",
-            "Difference between training loss and accuracy explain?"
+            "What is Generative AI and what can it create?",
+            "Give examples of GenAI tools like ChatGPT, DALL-E, etc.",
+            "How is GenAI different from traditional AI?"
         ]
     ),
     Checkpoint(
         id="cp4",
-        topic="Backpropagation",
+        topic="Large Language Models",
         objectives=[
-            "Explain how backpropagation works in neural networks",
-            "Describe the role of chain rule in calculating gradients",
-            "How errors propagate backward through the network?"
+            "What are Large Language Models?",
+            "How do LLMs understand and generate text?",
+            "Give examples of popular LLMs and their uses"
         ]
     ),
     Checkpoint(
         id="cp5",
-        topic="Gradient Descent Optimization",
+        topic="Prompt Engineering",
         objectives=[
-            "Explain the concept of gradient descent",
-            "What is learning rate and how does it affect training?",
-            "Difference between batch, mini-batch, and stochastic gradient descent?"
+            "What is prompt engineering and why is it important?",
+            "How to write effective prompts for AI models?",
+            "Give examples of good and bad prompts"
         ]
     ),
     Checkpoint(
         id="cp6",
-        topic="Regularization Techniques",
+        topic="AI Ethics and Safety",
         objectives=[
-            "What is overfitting and why does it happen?",
-            "Explain L1 and L2 regularization methods",
-            "How does dropout help prevent overfitting?"
+            "What are the ethical concerns with AI?",
+            "Explain AI bias and fairness",
+            "How can we use AI responsibly?"
         ]
     )
 ]
@@ -118,29 +126,31 @@ CHECKPOINTS: List[Checkpoint] = [
 # MILESTONE 1: User-provided notes
 USER_NOTES: Dict[str, str] = {
     "cp1": """
-Neural network have many neurons in layers. Each neuron take inputs, multiply
-them with weights, add bias, then put through activation function like ReLU
-or sigmoid. Weights tell how much each input important, bias give little
-adjustment. Activation function make it non-linear so model can learn
-complex patterns not just straight lines.
+Artificial Intelligence (AI) is when computers can do tasks that normally need
+human intelligence, like understanding language, recognizing images, or making
+decisions. Unlike normal programs that follow fixed rules, AI learns from data
+and improves over time. Examples in daily life: Google search suggestions,
+Netflix recommendations, face unlock on phones, and spam email filters. AI is
+the big umbrella, Machine Learning (ML) is a type of AI that learns from data,
+and Deep Learning is a special ML technique using neural networks with many layers.
+    """,
+    "cp3": """
+Generative AI (GenAI) is AI that can create new content like text, images,
+music, or videos. Popular tools include ChatGPT for text, DALL-E for images,
+and Midjourney for art. Traditional AI mainly analyzes or classifies existing
+data (like detecting spam), but GenAI creates something completely new. It learns
+patterns from millions of examples and then generates original content based on
+what it learned. GenAI is becoming very popular because it can help write emails,
+create artwork, code programs, and many creative tasks.
     """,
     "cp4": """
-Backpropagation is the algorithm used to train neural networks by calculating
-gradients. It works by computing the error at the output layer and then
-propagating it backward through the network using the chain rule. Each layer
-receives error signal and calculates how much each weight contributed to the
-error. This way we know which weights to adjust and by how much. The chain
-rule lets us multiply partial derivatives together to get the gradient for
-weights in earlier layers.
-    """,
-    "cp5": """
-Gradient descent is optimization algorithm that updates weights to minimize
-loss function. Learning rate controls how big steps we take - too big means
-we might overshoot minimum, too small means training very slow. Batch gradient
-descent uses all training data for each update which is stable but slow.
-Stochastic gradient descent (SGD) uses one sample at a time which is noisy
-but fast. Mini-batch is middle ground using small batches like 32 or 64
-samples, giving good balance of speed and stability.
+Large Language Models (LLMs) are AI systems trained on huge amounts of text
+from the internet to understand and generate human language. Examples include
+ChatGPT, Google Bard, and Claude. They work by predicting what word should come
+next based on patterns learned from training data. LLMs can answer questions,
+write essays, translate languages, write code, and have conversations. They use
+billions of parameters (settings) to understand context and meaning. The more
+data and parameters they have, the better they perform at language tasks.
     """
 }
 
@@ -344,11 +354,11 @@ def make_search_index(material_text):
 
 # MILESTONE 2: QUESTION GENERATION
 @traceable(name="generate_questions", run_type="chain")
-def generate_questions(checkpoint_obj, material, num_questions=2):
+def generate_questions(checkpoint_obj, material, num_questions=6):
     # Generate targeted questions based on checkpoint objectives
     message = f"Generate {num_questions} numbered questions about: {checkpoint_obj.topic}\n\nQuestions:"
     
-    reply = invoke_llm(message, max_tokens=80)
+    reply = invoke_llm(message, max_tokens=300)
     
     questions = []
     lines = reply.split("\n")
@@ -476,18 +486,20 @@ def grade_answers(checkpoint_obj, material, questions, answers):
         
         # Topic-specific keywords
         key_terms = []
-        if "neuron" in question_lower:
-            key_terms = ["neuron", "input", "weight", "bias", "activation"]
-        elif "weight" in question_lower or "bias" in question_lower:
-            key_terms = ["weight", "bias", "multiply", "important", "adjust"]
-        elif "activation" in question_lower:
-            key_terms = ["activation", "function", "relu", "sigmoid", "non-linear"]
-        elif "forward" in question_lower or "propagation" in question_lower:
-            key_terms = ["layer", "forward", "propagation", "input", "output"]
-        elif "loss" in question_lower:
-            key_terms = ["loss", "error", "measure", "training", "accuracy"]
+        if "artificial intelligence" in question_lower or "ai" in question_lower:
+            key_terms = ["intelligence", "human", "learn", "data", "computer", "program"]
+        elif "machine learning" in question_lower or "ml" in question_lower:
+            key_terms = ["learn", "data", "training", "supervised", "unsupervised", "model"]
+        elif "generative" in question_lower or "genai" in question_lower:
+            key_terms = ["generate", "create", "content", "text", "image", "chatgpt"]
+        elif "llm" in question_lower or "language model" in question_lower:
+            key_terms = ["language", "text", "predict", "understand", "chatgpt", "parameters"]
+        elif "prompt" in question_lower:
+            key_terms = ["prompt", "instruction", "clear", "specific", "context", "example"]
+        elif "ethics" in question_lower or "bias" in question_lower:
+            key_terms = ["bias", "fair", "ethical", "responsible", "safety", "privacy"]
         else:
-            key_terms = ["neural", "network", "learn", "data", "model"]
+            key_terms = ["ai", "machine", "learn", "data", "model", "intelligent"]
         
         terms_found = sum(1 for term in key_terms if term in answer_lower)
         term_score = min(0.5, terms_found * 0.15)
@@ -513,7 +525,7 @@ def grade_answers(checkpoint_obj, material, questions, answers):
 
 # UI Components
 def render_header():
-    st.title("Neural Networks Study System")
+    st.title("AI-Powered Study System")
     st.markdown("---")
 
 # MILESTONE 4: CHECKPOINT SELECTION & SEQUENTIAL PROGRESSION
