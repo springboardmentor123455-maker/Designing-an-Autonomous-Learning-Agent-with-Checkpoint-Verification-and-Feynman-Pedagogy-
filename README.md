@@ -387,14 +387,7 @@ Enable detailed execution tracing:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
 
-- **LangChain Team** for the incredible framework ecosystem
-- **Groq** for fast, affordable LLM inference
-- **HuggingFace** for open-source embedding models
-- **Feynman** for the timeless teaching technique
-
- 
 **Made with ❤️ by [ Chaitanya Sai ]**
 
 *Empowering learners through adaptive AI tutoring*
