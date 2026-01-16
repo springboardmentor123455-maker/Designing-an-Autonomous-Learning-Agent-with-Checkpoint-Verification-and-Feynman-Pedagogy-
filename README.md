@@ -15,6 +15,12 @@ Built on the cutting-edge **LangGraph** framework and powered by **Llama-3**, th
 3.  **📝 Tests** your knowledge with dynamically generated Quizzes.
 4.  **💡 Adapts** to your failures by explaining concepts simply (The Feynman Technique).
 
+---
+## 📚 Documentation
+*   **[Step-by-Step Guide](STEP_BY_STEP_GUIDE.md)**: Shows you exactly how to run everything with no confusion.
+*   **[Technical Guide](TECHNICAL_GUIDE.md)**: Explains how the system works behind the scenes in an easy-to-understand format.
+
+---
 ## 🌟 Why This Project?
 Traditional learning tools are static. They don't know when you are confused.
 *   **Static Quizzes** give you a score (e.g., "50%").
