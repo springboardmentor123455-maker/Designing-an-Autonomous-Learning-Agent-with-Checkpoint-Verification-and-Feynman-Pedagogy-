@@ -1,393 +1,187 @@
-# 🎓 Autonomous Learning Agent
+# 🎓 Autonomous Learning Agent (ALA) 🤖📚
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![LangChain](https://img.shields.io/badge/LangChain-latest-green.svg)](https://github.com/langchain-ai/langchain)
-[![LangGraph](https://img.shields.io/badge/LangGraph-latest-orange.svg)](https://github.com/langchain-ai/langgraph)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+**An AI-powered Adaptive Tutor that PERCEIVES, ACTS, and ADAPTS using the Feynman Technique.**
 
-> An intelligent, adaptive tutoring system that guides learners through structured knowledge checkpoints with AI-powered assessment and Feynman Technique remediation.
+> *"Education is not the learning of facts, but the training of the mind to think."* - Albert Einstein
 
-## 🌟 Overview
+---
 
-This project implements an autonomous learning agent using LangGraph to create a personalized educational experience. The system:
+## 🚀 Overview
+The **Autonomous Learning Agent (ALA)** is not just a chatbot. It is a **Cognitive Architecture** designed to autonomously manage the educational lifecycle of a student.
 
-- ✅ **Structures learning** through sequential checkpoints
-- 🔍 **Gathers context** from user notes and web search
-- 📝 **Generates quizzes** tailored to learning objectives
-- 🎯 **Verifies understanding** with 70% mastery threshold
-- 🧠 **Applies Feynman Technique** for adaptive remediation
-- 📊 **Tracks progress** and enforces mastery-based advancement
+Built on the cutting-edge **LangGraph** framework and powered by **Llama-3**, this agent acts as a personal professor. It doesn't rely on pre-written textbooks; instead, it:
+1.  **🔍 Searches** the live web for the latest information on a topic.
+2.  **🧠 Synthesizes** vast amounts of data into concise, structured Study Guides.
+3.  **📝 Tests** your knowledge with dynamically generated Quizzes.
+4.  **💡 Adapts** to your failures by explaining concepts simply (The Feynman Technique).
 
-### Key Features
+## 🌟 Why This Project?
+Traditional learning tools are static. They don't know when you are confused.
+*   **Static Quizzes** give you a score (e.g., "50%").
+*   **ALA** gives you a **Strategy**. It identifies *exactly* why you failed and teaches you that specific concept before letting you try again.
 
-| Feature | Description |
-|---------|-------------|
-| **Adaptive Context Gathering** | Combines user-provided notes with real-time web search |
-| **Smart Content Validation** | LLM-powered relevance scoring ensures quality materials |
-| **Vector-Based Processing** | Context chunking and embedding for efficient retrieval |
-| **Dynamic Quiz Generation** | AI-created MCQs tailored to checkpoint objectives |
-| **Feynman Remediation** | Simplified explanations with analogies for failed concepts |
-| **Mastery-Based Progression** | Must achieve 70%+ to advance, with 3 retry attempts |
+---
 
-## 🏗️ Architecture
+## ✨ Key Features
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Learning Workflow                        │
-└─────────────────────────────────────────────────────────────┘
-                            ↓
-                 ┌──────────────────────┐
-                 │ Define Checkpoint    │
-                 │ (Topic + Objectives) │
-                 └──────────┬───────────┘
-                            ↓
-                 ┌──────────────────────┐
-                 │  Gather Context      │
-                 │ (Notes + Web Search) │
-                 └──────────┬───────────┘
-                            ↓
-                 ┌──────────────────────┐
-                 │  Validate Context    │
-                 │  (LLM Relevance)     │
-                 └──────────┬───────────┘
-                            ↓
-                    ┌───────┴───────┐
-                    │ Score < 4?    │
-              Yes ──┤ Attempts < 3? ├── No
-                    └───────┬───────┘
-                            ↓ (Process)
-                 ┌──────────────────────┐
-                 │  Process Context     │
-                 │ (Chunk + Embed)      │
-                 └──────────┬───────────┘
-                            ↓
-                 ┌──────────────────────┐
-                 │ Create Study Guide   │
-                 │   (Key Concepts)     │
-                 └──────────┬───────────┘
-                            ↓
-                 ┌──────────────────────┐
-                 │   Generate Quiz      │
-                 │   (4 MCQs)           │
-                 └──────────┬───────────┘
-                            ↓
-                 ┌──────────────────────┐
-                 │     Take Quiz        │
-                 │  (User Input)        │
-                 └──────────┬───────────┘
-                            ↓
-                 ┌──────────────────────┐
-                 │   Evaluate Quiz      │
-                 │   (Score %)          │
-                 └──────────┬───────────┘
-                            ↓
-                    ┌───────┴────────┐
-                    │ Score >= 70%?  │
-             Yes ───┤                ├── No
-                    └───────┬────────┘
-                            │            ↓
-                            │    ┌───────────────┐
-                            │    │ Loops < 3?    │
-                            │    └───────┬───────┘
-                            │            ↓ Yes
-                            │    ┌───────────────┐
-                            │    │   Feynman     │
-                            │    │  Remediation  │
-                            │    └───────┬───────┘
-                            │            │
-                            │            └──────────┐
-                            ↓                       ↓
-                       ┌─────────┐         (Back to Quiz)
-                       │   END   │
-                       │(Success)│
-                       └─────────┘
-```
+### 1. 🌐 Autonomous Context Gathering
+*   The agent uses **DuckDuckGo** to perform real-time research.
+*   It reads multiple sources, filters out noise, and chunks relevant information for its memory.
 
-## 🚀 Getting Started
+### 2. 🧠 Cognitive State Machine (LangGraph)
+*   The system is built as a **Directed Graph**.
+*   It moves logically: `Gather` used `Process` -> `Study` -> `Quiz` -> `Evaluate`.
+*   It maintains **State** (memory of your score, your gaps, and your attempts) across the entire session.
 
-### Prerequisites
+### 3. 🔥 The Feynman Remediation Loop
+*   **The "Secret Sauce"**: If you fail a quiz (<70%), the agent enters a special "Remediation Mode".
+*   It analyzes your wrong answers.
+*   It uses the **Feynman Technique** to re-explain concepts using **Simple English** and **Analogies**.
+*   It forces you to re-learn before you can re-test.
 
-- Python 3.8 or higher
-- Groq API key (free tier available at [console.groq.com](https://console.groq.com))
-- LangSmith API key (optional, for tracing)
+### 4. 📚 Dynamic Curriculum & Navigation
+*   **Sequential Learning**: Progress through 4 Checkpoints (CP1: Intro -> CP2: Types -> CP3: Architecture -> CP4: Design).
+*   **Full Control**: A professional CLI Menu lets you:
+    *   `[N]ext`: Move forward if you passed.
+    *   `[P]revious`: Go back to review.
+    *   `[R]etry`: Attempt the quiz again.
+    *   `[Q]uit`: Save and exit.
 
-### Installation
+---
 
-1. **Clone the repository**
+## 🛠️ Technical Stack
+
+| Component | Technology | Role |
+| :--- | :--- | :--- |
+| **Orchestration** | 🦜🕸️ `LangGraph` | Manages the workflow and state transitions. |
+| **Intelligence** | 🦙 `Llama-3-70b` | High-IQ reasoning for generation and grading. |
+| **Infrastructure** | ☁️ `Groq API` | Lightning-fast inference engine. |
+| **Memory** | 💾 `ChromaDB` | Vector storage for processing context. |
+| **Search** | 🦆 `DuckDuckGo` | Privacy-focused tool for web research. |
+| **Observability** | 🛠️ `LangSmith` | Tracing and debugging complex agent flows. |
+
+---
+
+## � Project Structure
+
 ```bash
-git clone https://github.com/yourusername/autonomous-learning-agent.git
+autonomous-learning-agent/
+├── 📄 main.py           # 🏁 Entry Point: Manages the CLI session & Navigation
+├── 📄 graph.py          # 🕸️ The Brain: Defines Nodes, Edges, and Logic Flow
+├── 📄 nodes.py          # ⚡ The Workers: Functions for Quiz, Study, Search
+├── 📄 data.py           # 📚 The Books: Curriculum definitions (Topics, Objectives)
+├── 📄 models.py         # 🧬 The DNA: Data types (AgentState, Checkpoint codes)
+├── 📄 config.py         # ⚙️ Settings: API keys and Tool initialization
+├── 📄 requirements.txt  # 📦 Dependencies: List of Python libraries
+└── 📄 README.md         # 📖 Documentation: You are reading it!
+```
+
+---
+
+## 📦 Installation & Setup
+
+### 1️⃣ Clone the Repository
+Get the code on your machine:
+```bash
+git clone https://github.com/your-username/autonomous-learning-agent.git
 cd autonomous-learning-agent
 ```
 
-2. **Create virtual environment**
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-3. **Install dependencies**
+### 2️⃣ Install Dependencies
+We use `pip` to install the necessary libraries:
 ```bash
 pip install -r requirements.txt
 ```
 
-4. **Configure environment variables**
-
-Create a `.env` file in the project root:
-
+### 3️⃣ Configure Secrets 🔑
+Security is important! Create a `.env` file in the root folder and add your keys:
 ```env
-# Required: Groq API Key
-GROQ_API_KEY=your_groq_api_key_here
+# Get this from https://console.groq.com
+GROQ_API_KEY="your_groq_api_key"
 
-# Optional: LangSmith Tracing (for debugging)
+# Get these from https://smith.langchain.com (Optional but recommended)
 LANGCHAIN_TRACING_V2=true
-LANGCHAIN_ENDPOINT=https://api.smith.langchain.com
-LANGCHAIN_API_KEY=your_langsmith_api_key_here
-LANGCHAIN_PROJECT=AutonomousLearningAgent
+LANGCHAIN_API_KEY="your_langchain_api_key"
 ```
 
-> **Getting API Keys:**
-> - **Groq**: Sign up at [console.groq.com](https://console.groq.com) → API Keys
-> - **LangSmith** (optional): Visit [smith.langchain.com](https://smith.langchain.com)
+---
 
-### Quick Start
+## 🎮 How to Run
 
-```bash
-python main.py
+1.  **Launch the Agent**:
+    ```bash
+    python main.py
+    ```
+
+2.  **Start Learning**:
+    *   Select `cp1` when prompted.
+    *   Read the **Study Guide** carefully.
+    *   Answer the **4 Questions**.
+
+3.  **Experience the Loop**:
+    *   **Try Failing**: Intentionally pick wrong answers on CP2 to see the **Feynman Remediation** in action!
+    *   **Try Passing**: Score 3/4 or 4/4 to unlock the `[N]ext` button.
+
+---
+
+## 🤝 Contributing
+Contributions are welcome!
+1.  Fork the Project.
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`).
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`).
+4.  Push to the Branch (`git push origin feature/AmazingFeature`).
+5.  Open a Pull Request.
+
+---
+
+## 📜 License
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+## 📸 Demo Output (Example Run)
+Want to see it in action? Click below to expand a full session transcript where the user **Fails** a quiz and gets **Feynman Remediation**.
+
+<details>
+<summary><strong>CLICK TO VIEW TERMINAL OUTPUT 🔽</strong></summary>
+
+```text
+=== AUTONOMOUS LEARNING AGENT ===
+Welcome to your adaptive learning session.
+Available checkpoints: cp1, cp2, cp3, cp4
+
+Which checkpoint do you want to start with? (Default: cp1)
+> cp2
+
+=== MODULE: CP2 ===
+[define_checkpoint] Selected checkpoint: cp2 - Types of AI Agents
+[gather_context] Web search query: Types of AI Agents...
+[process_context] Chunking and embedding context...
+
+=== STUDY GUIDE: CP2 ===
+**Key Concepts**: Simple Reflex, Goal-Based, Utility-Based Agents...
+========================================
+
+[generate_quiz] Generating 4 MCQs...
+
+=== CP2 QUIZ: Types of AI Agents ===
+Question 1: Which agent uses a condition-action rule?
+  Your answer: B (Incorrect)
+...
+[evaluate_quiz] Score: 50.0% (FAILED)
+
+[feynman_remediation] Analyzing knowledge gaps...
+=== FEYNMAN EXPLANATION ===
+Imagine a **Simple Reflex Agent** is like a knee-jerk reaction: If you touch fire, move hand.
+A **Goal Based Agent** is like playing Chess. It looks ahead to win the game.
+You confused the two!
+===========================
+
+[generate_quiz] Generating MCQs...
+(User retakes quiz and passes)
 ```
+</details>
 
-**First-time workflow:**
-1. Select a checkpoint (default: `cp1`)
-2. Optionally paste study notes (or press Enter to skip)
-3. Review generated study guide
-4. Take the 4-question quiz
-5. Review results and explanations
-6. Progress to next checkpoint (if passed) or retry
+---
 
-## 📚 Project Structure
-
-```
-autonomous-learning-agent/
-│
-├── main.py                 # Entry point, user interface, navigation logic
-├── graph.py                # LangGraph workflow definition
-├── nodes.py                # Individual workflow nodes (functions)
-├── models.py               # Type definitions (AgentState, Checkpoint)
-├── data.py                 # Checkpoint definitions (cp1-cp4)
-├── config.py               # LLM and tool initialization
-├── requirements.txt        # Python dependencies
-├── .env                    # Environment variables (API keys)
-└── README.md               # This file
-```
-
-### Key Files Explained
-
-| File | Purpose | Key Components |
-|------|---------|----------------|
-| **main.py** | User interaction loop | Checkpoint selection, quiz interface, navigation |
-| **graph.py** | Workflow orchestration | StateGraph definition, conditional edges |
-| **nodes.py** | Business logic | 11 node functions (context gathering, quiz generation, etc.) |
-| **models.py** | Data structures | `AgentState` (12 fields), `Checkpoint` (4 fields) |
-| **data.py** | Learning content | 4 checkpoints on AI Agents topic |
-| **config.py** | External integrations | Groq LLM, DuckDuckGo search |
-
-## 🎯 Learning Checkpoints
-
-The system currently includes 4 checkpoints on **AI Agents**:
-
-| ID | Topic | Objectives | Success Criteria |
-|----|-------|------------|------------------|
-| **cp1** | Introduction to AI Agents | Define AI agents, explain perception/action, list examples | Clear definition with component descriptions |
-| **cp2** | Types of AI Agents | Explain agent types (reflex, model-based, goal-based, utility-based) | Name and explain main types |
-| **cp3** | Architecture of AI Agents | Explain architecture, sensors/actuators, environment interaction | Describe structure and interactions |
-| **cp4** | AI Agent Environments | Explain environment types, observable vs. partial, relate to behavior | Classify environments and their impact |
-
-### Adding Custom Checkpoints
-
-Edit `data.py`:
-
-```python
-CHECKPOINTS = {
-    "cp5": {
-        "id": "cp5",
-        "topic": "Your Topic Here",
-        "objectives": [
-            "Learning objective 1",
-            "Learning objective 2",
-            # Add 2-4 objectives
-        ],
-        "success_criteria": "Learner can demonstrate X and Y.",
-    }
-}
-```
-
-## 🔧 Technical Stack
-
-### Core Technologies
-
-| Technology | Purpose | Version |
-|------------|---------|---------|
-| **Python** | Programming language | 3.8+ |
-| **LangGraph** | Workflow orchestration | Latest |
-| **LangChain** | LLM integration framework | Latest |
-| **Groq** | LLM inference (Llama 3.3 70B) | API |
-| **DuckDuckGo** | Web search (no API key) | `duckduckgo-search` |
-
-### Data Processing
-
-| Component | Library | Purpose |
-|-----------|---------|---------|
-| **Text Splitting** | `RecursiveCharacterTextSplitter` | 500-char chunks, 50-char overlap |
-| **Embeddings** | `HuggingFaceEmbeddings` | all-MiniLM-L6-v2 model (384-dim) |
-| **Vector Store** | `Chroma` | Ephemeral storage for context chunks |
-
-### LLM Configuration
-
-```python
-ChatGroq(
-    model="llama-3.3-70b-versatile",  # 70B parameter model
-    temperature=0.2                    # Balanced creativity/consistency
-)
-```
-
-**Model Choice Rationale:**
-- **Llama 3.3 70B**: Strong reasoning for educational tasks
-- **Temperature 0.2**: Deterministic enough for assessments, creative enough for explanations
-- **Groq Inference**: Sub-second response times critical for real-time tutoring
-
-## 📊 Workflow Details
-
-### 1. Context Gathering & Validation
-
-**Process:**
-```python
-1. Collect user notes (if provided)
-2. Execute web search: f"{topic} - {objectives}"
-3. Combine materials
-4. LLM scores relevance (1-5)
-5. If score < 4 and attempts < 3: retry
-6. Otherwise: proceed to processing
-```
-
-**Validation Prompt Template:**
-```
-Judge how relevant the context is to the objectives.
-Scale: 1 = useless, 5 = highly relevant.
-Reply with a single number.
-```
-
-### 2. Quiz Generation
-
-**Specifications:**
-- Exactly 4 MCQs per checkpoint
-- 4 options per question (A-D)
-- Includes correct answer + explanation
-- JSON format for parsing
-
-**Generation Prompt Template:**
-```
-Generate EXACTLY 4 MCQs based on context.
-Output Format: Pure JSON array (no markdown).
-[
-  {
-    "question": "...",
-    "options": {"A": "...", "B": "...", "C": "...", "D": "..."},
-    "correct_option": "B",
-    "explanation": "..."
-  }
-]
-```
-
-### 3. Evaluation & Remediation
-
-**Scoring:**
-- Pass threshold: ≥70%
-- Formula: `(correct_answers / total_questions) × 100`
-
-**Feynman Remediation:**
-- Triggered when score < 70%
-- Maximum 3 remediation loops
-- Simplification strategy:
-  - Plain English (no jargon)
-  - Analogies and metaphors
-  - Maximum 200 words
-  - Focus on failed concepts only
-
-**Feynman Prompt Template:**
-```
-You are an expert tutor using the Feynman Technique.
-The student failed these concepts: [gaps]
-Task:
-1. Explain in simple, plain English
-2. Use an analogy if possible
-3. Keep it concise (max 200 words)
-```
-
-## 🐛 Debugging & Monitoring
-
-### LangSmith Tracing
-
-Enable detailed execution tracing:
-
-1. Set `LANGCHAIN_TRACING_V2=true` in `.env`
-2. Run application
-3. View traces at [smith.langchain.com](https://smith.langchain.com)
-
-**What you'll see:**
-- Node execution order
-- LLM input/output for each call
-- State transitions between nodes
-- Conditional edge decisions
-- Timing information
-
-### Common Issues & Solutions
-
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| **JSON parsing error in quiz** | LLM returns markdown-wrapped JSON | Handled automatically with `.replace("```json", "")` |
-| **Low relevance scores** | Generic search queries | Refine objectives to be more specific |
-| **Web search timeout** | DuckDuckGo rate limiting | Wait 1 minute, retry |
-| **Empty context** | Search returned no results | Provide user notes as fallback |
-
-## 🎯 Milestones & Progress
-
-### ✅ Milestone 1: Checkpoint Structure (Weeks 1-2)
-- [x] Project environment setup
-- [x] Checkpoint data structure
-- [x] Context gathering (notes + web search)
-- [x] Context validation with LLM scoring
-
-**Evaluation:** Context relevance >4/5 average ✓
-
-### ✅ Milestone 2: Context Processing & Verification (Weeks 3-4)
-- [x] Text chunking and embedding
-- [x] Vector store integration (Chroma)
-- [x] Quiz generation (4 MCQs)
-- [x] Automated scoring against 70% threshold
-
-**Evaluation:** 80%+ question relevance, 90%+ scoring accuracy ✓
-
-### ✅ Milestone 3: Feynman Implementation (Weeks 5-6)
-- [x] Knowledge gap identification
-- [x] Simplified explanation generation
-- [x] Remediation loop integration
-- [x] Re-assessment after teaching
-
-**Evaluation:** 80%+ explanations rated "simpler", 100% correct loop routing ✓
-
-### ✅ Milestone 4: Integration & Testing (Weeks 7-8)
-- [x] Multi-checkpoint progression
-- [x] End-to-end testing (3+ checkpoint paths)
-- [x] Navigation controls (Next/Retry/Previous/Quit)
-- [x] Detailed quiz review display
-
-**Evaluation:** 80%+ successful path completion ✓
-
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-
-**Made with ❤️ by [ Chaitanya Sai ]**
-
-*Empowering learners through adaptive AI tutoring*
+*Built with ❤️ for the Future of Education.*
