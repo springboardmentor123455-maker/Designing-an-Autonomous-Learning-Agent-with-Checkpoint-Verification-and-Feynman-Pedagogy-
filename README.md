@@ -89,8 +89,8 @@ autonomous-learning-agent/
 ### 1️⃣ Clone the Repository
 Get the code on your machine:
 ```bash
-git clone https://github.com/your-username/autonomous-learning-agent.git
-cd autonomous-learning-agent
+git clone https://github.com/your-username/project-name.git
+cd project-name
 ```
 
 ### 2️⃣ Install Dependencies
