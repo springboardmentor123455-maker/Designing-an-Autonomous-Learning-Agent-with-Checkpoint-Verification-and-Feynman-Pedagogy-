@@ -13,7 +13,7 @@
 
 ---
 
-## ✅ Phase 1: Environment Setup
+## Phase 1: Environment Setup ✅
 *Before we run the AI, we must prepare the computer.*
 
 ### Step 1.1: Verify Python Installation
@@ -46,7 +46,7 @@ The agent relies on specialized brain-power libraries.
 
 ---
 
-## ⚙️ Phase 2: Configuration
+## Phase 2: Configuration ⚙️
 *We need to give the Agent its "Keys" to access the internet and the LLM.*
 
 ### Step 2.1: Locate the Environment File
@@ -65,7 +65,7 @@ The agent relies on specialized brain-power libraries.
 
 ---
 
-## 🚀 Phase 3: Running the Simulation
+## Phase 3: Running the Simulation 🚀
 *Now the magic happens. We will start the AI agent.*
 
 ### Step 3.1: Launch Command
@@ -82,7 +82,7 @@ The agent will wake up and ask you where to begin.
 
 ---
 
-## 👁️ Phase 4: Understanding the Output
+## Phase 4: Understanding the Output 👁️
 *Here is a guide to what you will see on the screen.*
 
 ### 🔍 Stage 1: The Research (Gathering Context)
@@ -120,7 +120,7 @@ The agent will wake up and ask you where to begin.
 
 ---
 
-## 🔧 Troubleshooting & FAQ
+## Troubleshooting & FAQ 🔧
 
 ### Q: I get an error `ModuleNotFoundError: No module named 'langgraph'`?
 **A:** You didn't install the libraries correctly.
