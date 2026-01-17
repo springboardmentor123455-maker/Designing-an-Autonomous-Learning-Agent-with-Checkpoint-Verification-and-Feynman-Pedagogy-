@@ -18,3 +18,7 @@ class AgentState(TypedDict):
     
     user_answers: Dict[str, str]
     quiz_score: int
+    
+    knowledge_gaps: List[str]
+    feynman_explanation: str
+    feynman_attempt_count: int

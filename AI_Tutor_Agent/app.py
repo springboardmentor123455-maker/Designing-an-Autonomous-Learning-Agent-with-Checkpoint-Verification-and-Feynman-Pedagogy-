@@ -3,6 +3,7 @@ import time
 from src.graph import build_graph
 from src.models import LearningCheckpoint
 from src.subjective_evaluator import evaluate_subjective_answers
+from src.feyman_instructor import identify_knowledge_gaps, generate_feynman_explanation, format_feynman_for_display
 
 # --- PAGE CONFIG ---
 st.set_page_config(
@@ -26,6 +27,13 @@ st.markdown("""
         border-left: 5px solid #2E86C1;
         line-height: 1.6;
     }
+    .feynman-box {
+        background-color: #fff4e6;
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 5px solid #ff9800;
+        line-height: 1.6;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -44,6 +52,14 @@ if "assessment_type" not in st.session_state:
     st.session_state.assessment_type = None
 if "subjective_evaluation" not in st.session_state:
     st.session_state.subjective_evaluation = None
+if "show_feynman" not in st.session_state:
+    st.session_state.show_feynman = False
+if "feynman_explanation" not in st.session_state:
+    st.session_state.feynman_explanation = ""
+if "feynman_attempt_count" not in st.session_state:
+    st.session_state.feynman_attempt_count = 0
+if "knowledge_gaps" not in st.session_state:
+    st.session_state.knowledge_gaps = []
 
 # --- HEADER ---
 st.title("AI Tutor: Sequential Mastery")
@@ -53,7 +69,7 @@ st.divider()
 # --- SIDEBAR ---
 with st.sidebar:
     st.header("Configuration")
-    st.success(f"Model Active: gpt-4")
+    st.success(f"Model Active: gpt-5-nano")
     with st.expander("Upload Notes (Optional)"):
         uploaded_file = st.file_uploader("Upload .txt file", type="txt")
         user_notes_text = uploaded_file.read().decode("utf-8") if uploaded_file else ""
@@ -67,6 +83,10 @@ with st.sidebar:
                 st.markdown(f"**{item}** (Current)")
             else:
                 st.markdown(f"{item}")
+        
+        # Show Feynman attempt count if active
+        if st.session_state.feynman_attempt_count > 0:
+            st.info(f"📚 Feynman Explanations: {st.session_state.feynman_attempt_count}")
 
 # --- MAIN INPUT AREA ---
 if not st.session_state.checklist:
@@ -87,6 +107,7 @@ if not st.session_state.checklist:
         st.session_state.current_index = 0
         st.session_state.agent_run_completed = False
         st.session_state.assessment_type = None
+        st.session_state.feynman_attempt_count = 0
         st.rerun()
 
 # --- ACTIVE COURSE VIEW ---
@@ -149,7 +170,7 @@ else:
     if st.session_state.agent_run_completed:
         final_state = st.session_state.final_state
         
-        st.markdown(f"### Study Material: {current_obj}")
+        st.markdown(f"### 📚 Study Material: {current_obj}")
         
         # Show formatted content in a nice box
         formatted_material = final_state.get("formatted_content", final_state.get("gathered_context", "No content available."))
@@ -159,6 +180,17 @@ else:
             st.markdown(formatted_material)
             st.markdown('</div>', unsafe_allow_html=True)
         
+        # --- DISPLAY FEYNMAN EXPLANATION IF AVAILABLE ---
+        if st.session_state.show_feynman and st.session_state.feynman_explanation:
+            st.divider()
+            with st.container():
+                st.markdown('<div class="feynman-box">', unsafe_allow_html=True)
+                st.markdown(format_feynman_for_display(
+                    st.session_state.feynman_explanation,
+                    st.session_state.feynman_attempt_count
+                ))
+                st.markdown('</div>', unsafe_allow_html=True)
+        
         st.divider()
 
         # --- ASSESSMENT TYPE SELECTION ---
@@ -166,12 +198,14 @@ else:
             st.subheader("Choose Assessment Type")
             col1, col2 = st.columns(2)
             with col1:
-                if st.button("Objective Questions (MCQ)", use_container_width=True):
+                if st.button("📝 Objective Questions (MCQ)", use_container_width=True):
                     st.session_state.assessment_type = "objective"
+                    st.session_state.show_feynman = False  # Reset Feynman display
                     st.rerun()
             with col2:
-                if st.button("Subjective Questions", use_container_width=True):
+                if st.button("✍️ Subjective Questions", use_container_width=True):
                     st.session_state.assessment_type = "subjective"
+                    st.session_state.show_feynman = False  # Reset Feynman display
                     st.rerun()
 
         # --- OBJECTIVE ASSESSMENT ---
@@ -185,7 +219,7 @@ else:
                     st.rerun()
             
             quiz_data = final_state.get("quiz_questions", [])
-            st.subheader(f"Objective Assessment: {current_obj}")
+            st.subheader(f"📝 Objective Assessment: {current_obj}")
             
             if not quiz_data:
                 st.error("Failed to generate questions. Please try again.")
@@ -211,24 +245,59 @@ else:
                     
                     if score_pct >= 70:
                         st.balloons()
-                        st.success(f"PASSED! You have mastered '{current_obj}'.")
+                        st.success(f"✅ PASSED! You have mastered '{current_obj}'.")
                         if st.session_state.current_index < len(st.session_state.checklist) - 1:
                             if st.button(f"Proceed to Next: {st.session_state.checklist[st.session_state.current_index + 1]}", type="primary"):
                                 st.session_state.current_index += 1
                                 st.session_state.agent_run_completed = False
                                 st.session_state.quiz_submitted = False
                                 st.session_state.assessment_type = None
+                                st.session_state.feynman_attempt_count = 0
+                                st.session_state.show_feynman = False
                                 st.rerun()
                         else:
-                            st.success("COURSE COMPLETE!")
+                            st.success("🎉 COURSE COMPLETE!")
                             if st.button("Start New Topic"):
                                 st.session_state.clear()
                                 st.rerun()
                     else:
-                        st.error("Score below 70%. Review and retake.")
-                        if st.button("Retake Quiz"):
-                            st.session_state.quiz_submitted = False
-                            st.rerun()
+                        st.error("❌ Score below 70%. Let's simplify the concepts.")
+                        
+                        # --- FEYNMAN TEACHING TRIGGER ---
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            if st.button("🎓 Get Simplified Explanation", use_container_width=True):
+                                with st.spinner("Generating Feynman explanation..."):
+                                    # Identify gaps
+                                    correct_answers_map = {idx: q.get('answer') for idx, q in enumerate(quiz_data)}
+                                    gaps = identify_knowledge_gaps(
+                                        quiz_data,
+                                        user_answers,
+                                        correct_answers_map,
+                                        "objective"
+                                    )
+                                    st.session_state.knowledge_gaps = gaps
+                                    
+                                    # Generate Feynman explanation
+                                    feynman_text = generate_feynman_explanation(
+                                        gaps,
+                                        formatted_material,
+                                        current_obj
+                                    )
+                                    st.session_state.feynman_explanation = feynman_text
+                                    st.session_state.feynman_attempt_count += 1
+                                    st.session_state.show_feynman = True
+                                    
+                                    # Clear quiz submission to allow retake
+                                    st.session_state.quiz_submitted = False
+                                    del final_state["quiz_questions"]  # Force new questions
+                                    st.rerun()
+                        
+                        with col2:
+                            if st.button("🔄 Retake Quiz Directly", use_container_width=True):
+                                st.session_state.quiz_submitted = False
+                                del final_state["quiz_questions"]  # Force new questions
+                                st.rerun()
 
         # --- SUBJECTIVE ASSESSMENT ---
         elif st.session_state.assessment_type == "subjective":
@@ -241,7 +310,7 @@ else:
                     st.rerun()
             
             subj_questions = final_state.get("subjective_questions", [])
-            st.subheader(f"Subjective Assessment: {current_obj}")
+            st.subheader(f"✍️ Subjective Assessment: {current_obj}")
             
             if not subj_questions:
                 st.error("Failed to generate questions.")
@@ -257,23 +326,23 @@ else:
                         st.markdown("---")
                     
                     if st.form_submit_button("Submit for Evaluation"):
-                        if all(user_answers.values()):
-                            with st.spinner("Evaluating your answers..."):
-                                evaluation = evaluate_subjective_answers(
-                                    subj_questions, 
-                                    user_answers, 
-                                    final_state["formatted_content"],  # Use formatted content
-                                    current_obj
-                                )
-                                st.session_state.subjective_evaluation = evaluation
-                                st.session_state.quiz_submitted = True
-                        else:
-                            st.warning("Please answer all questions before submitting.")
+                        # if all(user_answers.values()):
+                        with st.spinner("Evaluating your answers..."):
+                            evaluation = evaluate_subjective_answers(
+                                subj_questions, 
+                                user_answers, 
+                                final_state["formatted_content"],
+                                current_obj
+                            )
+                            st.session_state.subjective_evaluation = evaluation
+                            st.session_state.quiz_submitted = True
+                        # else:
+                            # st.warning("Please answer all questions before submitting.")
                 
                 if st.session_state.quiz_submitted and st.session_state.subjective_evaluation:
                     eval_data = st.session_state.subjective_evaluation
                     
-                    st.subheader("Evaluation Results")
+                    st.subheader("📊 Evaluation Results")
                     for idx, result in enumerate(eval_data["results"]):
                         with st.expander(f"Q{idx+1} - Score: {result['score']}/100"):
                             st.markdown(f"**Question:** {result['question']}")
@@ -285,7 +354,7 @@ else:
                     
                     if avg_score >= 70:
                         st.balloons()
-                        st.success(f"PASSED! You have mastered '{current_obj}'.")
+                        st.success(f"✅ PASSED! You have mastered '{current_obj}'.")
                         if st.session_state.current_index < len(st.session_state.checklist) - 1:
                             if st.button(f"Proceed to Next: {st.session_state.checklist[st.session_state.current_index + 1]}", type="primary"):
                                 st.session_state.current_index += 1
@@ -293,18 +362,54 @@ else:
                                 st.session_state.quiz_submitted = False
                                 st.session_state.assessment_type = None
                                 st.session_state.subjective_evaluation = None
+                                st.session_state.feynman_attempt_count = 0
+                                st.session_state.show_feynman = False
                                 st.rerun()
                         else:
-                            st.success("COURSE COMPLETE!")
+                            st.success("🎉 COURSE COMPLETE!")
                             if st.button("Start New Topic"):
                                 st.session_state.clear()
                                 st.rerun()
                     else:
-                        st.error("Average score below 70%. Review and retake.")
-                        if st.button("Retake Assessment"):
-                            st.session_state.quiz_submitted = False
-                            st.session_state.subjective_evaluation = None
-                            st.rerun()
+                        st.error("❌ Average score below 70%. Let's simplify the concepts.")
+                        
+                        # --- FEYNMAN TEACHING TRIGGER ---
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            if st.button("🎓 Get Simplified Explanation", use_container_width=True):
+                                with st.spinner("Generating Feynman explanation..."):
+                                    # Identify gaps from subjective evaluation
+                                    eval_results_map = {idx: result for idx, result in enumerate(eval_data["results"])}
+                                    gaps = identify_knowledge_gaps(
+                                        subj_questions,
+                                        user_answers,
+                                        eval_results_map,
+                                        "subjective"
+                                    )
+                                    st.session_state.knowledge_gaps = gaps
+                                    
+                                    # Generate Feynman explanation
+                                    feynman_text = generate_feynman_explanation(
+                                        gaps,
+                                        formatted_material,
+                                        current_obj
+                                    )
+                                    st.session_state.feynman_explanation = feynman_text
+                                    st.session_state.feynman_attempt_count += 1
+                                    st.session_state.show_feynman = True
+                                    
+                                    # Clear evaluation to allow retake
+                                    st.session_state.quiz_submitted = False
+                                    st.session_state.subjective_evaluation = None
+                                    del final_state["subjective_questions"]  # Force new questions
+                                    st.rerun()
+                        
+                        with col2:
+                            if st.button("🔄 Retake Assessment Directly", use_container_width=True):
+                                st.session_state.quiz_submitted = False
+                                st.session_state.subjective_evaluation = None
+                                del final_state["subjective_questions"]  # Force new questions
+                                st.rerun()
         
         # Back button
         if st.session_state.assessment_type is not None:
@@ -312,4 +417,5 @@ else:
                 st.session_state.assessment_type = None
                 st.session_state.quiz_submitted = False
                 st.session_state.subjective_evaluation = None
+                st.session_state.show_feynman = False
                 st.rerun()
