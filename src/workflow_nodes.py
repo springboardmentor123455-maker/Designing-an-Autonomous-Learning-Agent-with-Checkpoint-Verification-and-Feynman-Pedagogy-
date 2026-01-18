@@ -46,34 +46,88 @@ async def initialize_node(state: LearningAgentState) -> LearningAgentState:
 
 @trace_workflow_node("collect_materials")
 async def collect_materials_node(state: LearningAgentState) -> LearningAgentState:
-    """Collect learning materials."""
+    """Collect learning materials with dynamic generation and validation."""
     logger.info("📚 Collecting learning materials...")
     
     try:
         state["workflow_step"] = "collecting_materials"
         
-        # If materials are already provided, validate them
-        materials = state.get("collected_materials", [])
+        checkpoint = state["current_checkpoint"]
+        materials = []
         
-        if not materials:
-            # Generate default materials based on checkpoint
-            checkpoint = state["current_checkpoint"]
-            default_material = {
-                "id": f"material_{checkpoint['id']}",
-                "title": f"Learning Material for {checkpoint['title']}",
-                "content": f"This is learning content for {checkpoint['title']}. {checkpoint['description']}",
-                "source": "auto_generated"
-            }
-            materials = [default_material]
-            state["collected_materials"] = materials
+        # PRIORITY 1: Check for user-uploaded notes
+        user_notes_path = state.get("user_uploaded_notes_path")
+        if user_notes_path:
+            logger.info("📎 Processing user-uploaded notes...")
+            from .document_processor import get_document_processor
+            doc_processor = get_document_processor()
+            
+            # Process uploaded documents
+            if isinstance(user_notes_path, str):
+                user_notes_path = [user_notes_path]
+            
+            results = doc_processor.process_multiple_documents(user_notes_path)
+            
+            for result in results:
+                if result['success']:
+                    materials.append({
+                        "id": f"user_upload_{result['file_name']}",
+                        "title": f"User Notes: {result['file_name']}",
+                        "content": result['content'],
+                        "source": f"User Upload ({result['file_type'].upper()})",
+                        "type": "user_notes"
+                    })
+                    logger.info(f"   ✅ {result['file_name']} ({result['content_length']} chars)")
+        
+        # PRIORITY 2: Generate dynamic materials (LLM + Web Search)
+        logger.info("🤖 Generating dynamic learning materials...")
+        from .dynamic_materials import get_materials_generator
+        materials_gen = get_materials_generator()
+        
+        if materials:
+            # Enhance user materials with generated content
+            generated_materials = await materials_gen.enhance_user_materials(materials, checkpoint)
+            materials = generated_materials
+        else:
+            # No user materials - generate comprehensive content
+            generated_materials = await materials_gen.generate_comprehensive_materials(
+                checkpoint, 
+                use_web=True, 
+                use_llm=True
+            )
+            materials = generated_materials
+        
+        logger.info(f"📖 Collected {len(materials)} total materials")
+        
+        # VALIDATION: Check relevance with retry mechanism
+        logger.info("🔍 Validating material relevance...")
+        from .context_validation import get_context_validator
+        validator = get_context_validator()
+        
+        async def retry_gather_materials(cp):
+            """Callback for validation retry."""
+            logger.info("🔄 Gathering additional materials for validation retry...")
+            return await materials_gen.generate_materials_from_web(cp)
+        
+        valid, validation_result, final_materials = await validator.validate_with_retry(
+            materials,
+            checkpoint,
+            retry_callback=retry_gather_materials
+        )
+        
+        # Store validation results
+        state["materials_validation"] = validation_result
+        state["collected_materials"] = final_materials
         
         # Trace document collection for LangSmith
-        search_query = state["current_checkpoint"]["title"]
-        trace_document_retrieval(search_query, materials)
+        search_query = checkpoint["title"]
+        trace_document_retrieval(search_query, final_materials)
         
-        logger.info(f"📖 Collected {len(materials)} materials")
-        for material in materials:
-            logger.info(f"   • {material['title']} ({len(material['content'])} chars)")
+        logger.info(f"📊 Final material count: {len(final_materials)}")
+        logger.info(f"📊 Relevance score: {validation_result['average_score']:.2f}/5.0")
+        
+        for material in final_materials[:3]:  # Show first 3
+            logger.info(f"   • {material.get('title', 'N/A')[:60]}...")
         
         state["workflow_history"].append("collect_materials")
         return state
@@ -218,7 +272,7 @@ async def generate_questions_node(state: LearningAgentState) -> LearningAgentSta
 
 @trace_workflow_node("verify_understanding")
 async def verify_understanding_node(state: LearningAgentState) -> LearningAgentState:
-    """Verify understanding through question answering."""
+    """Verify understanding through interactive user question answering."""
     logger.info("✅ Verifying understanding...")
     
     try:
@@ -226,45 +280,91 @@ async def verify_understanding_node(state: LearningAgentState) -> LearningAgentS
         
         questions = state["generated_questions"]
         processed_context = state["processed_context"]
+        
+        if not questions:
+            logger.warning("No questions available for verification")
+            state["verification_results"] = []
+            return state
+        
+        # Check if answers are already provided (from Streamlit UI)
+        # If verification_results already exist, skip collection
+        if state.get("verification_results"):
+            logger.info("✓ Using pre-collected answers from UI")
+            return state
+        
+        # Only collect answers interactively if running in CLI mode
+        # In Streamlit, answers are collected by the UI and passed in state
+        user_mode = state.get("user_mode", "cli")
+        
+        if user_mode == "streamlit":
+            # Streamlit mode - questions are displayed in UI, don't collect here
+            logger.info("📊 Questions ready for UI display (Streamlit mode)")
+            # Return state with questions, let Streamlit handle answer collection
+            return state
+        
+        # CLI mode - collect answers interactively
+        from .user_interaction import collect_user_answers
+        user_answers = collect_user_answers(questions)
+        
+        # Evaluate each answer
         verification_results = []
         
-        for question in questions:
-            # Simulate learner answer
-            # Ensure context_chunks exists
-            context_chunks = question.get("context_chunks", [])
-            if not context_chunks:
-                # Use first few chunks from processed_context as fallback
-                context_chunks = processed_context[:3] if processed_context else []
+        for answer_data in user_answers:
+            question_text = answer_data["question"]
+            user_answer = answer_data["user_answer"]
+            question_type = answer_data["question_type"]
             
-            answer = await llm_service.simulate_learner_answer(
-                question["question"],
-                context_chunks,
-                processed_context
-            )
-            
-            # Score the answer
-            # Use expected_elements or expected_concepts, whichever exists
-            expected_concepts = question.get("expected_concepts") or question.get("expected_elements", [])
-            scoring = await llm_service.score_answer(
-                question["question"],
-                answer,
-                expected_concepts
-            )
+            # For MCQ, check if answer matches correct answer
+            if question_type == 'mcq':
+                correct_answer = answer_data.get("correct_answer", "")
+                
+                # Direct match check
+                if user_answer.upper() == correct_answer.upper():
+                    score = 1.0
+                    feedback = "Correct!"
+                elif not user_answer:
+                    score = 0.0
+                    feedback = "No answer provided"
+                else:
+                    score = 0.0
+                    feedback = f"Incorrect. The correct answer is {correct_answer}"
+                
+                scoring = {
+                    "score": score,
+                    "feedback": feedback,
+                    "reasoning": feedback
+                }
+            else:
+                # For open-ended, use LLM to evaluate
+                if not user_answer:
+                    scoring = {
+                        "score": 0.0,
+                        "feedback": "No answer provided",
+                        "reasoning": "Empty answer"
+                    }
+                else:
+                    # Use expected_concepts from question
+                    question_obj = next((q for q in questions if q["question"] == question_text), {})
+                    expected_concepts = question_obj.get("expected_concepts", [])
+                    
+                    scoring = await llm_service.score_answer(
+                        question=question_text,
+                        learner_answer=user_answer,
+                        expected_concepts=expected_concepts
+                    )
             
             # Create verification result
-            question_id = question.get("question_id", f"q_{len(verification_results) + 1}")
+            question_id = answer_data.get("question_id", f"q_{len(verification_results) + 1}")
             result = {
                 "question_id": question_id,
-                "learner_answer": answer,
+                "question": question_text,
+                "learner_answer": user_answer,
                 "score": scoring["score"],
                 "feedback": scoring["feedback"],
                 "scoring_details": scoring
             }
             
             verification_results.append(result)
-            logger.info(f"   Q: {question['question']}")
-            logger.info(f"   A: {answer[:100]}...")
-            logger.info(f"   Score: {scoring['score']:.2f}")
         
         state["verification_results"] = verification_results
         
@@ -298,6 +398,14 @@ async def check_threshold_node(state: LearningAgentState) -> LearningAgentState:
             state["score_percentage"] = score_percentage
             state["meets_threshold"] = score_percentage >= 70.0
         
+        # Display feedback to user
+        from .user_interaction import display_score_feedback
+        display_score_feedback(
+            state["score_percentage"],
+            state["meets_threshold"],
+            verification_results
+        )
+        
         logger.info(f"📊 Overall Score: {state['score_percentage']:.1f}%")
         logger.info(f"🎯 Meets 70% Threshold: {'✅ YES' if state['meets_threshold'] else '❌ NO'}")
         
@@ -330,43 +438,104 @@ async def complete_checkpoint_node(state: LearningAgentState) -> LearningAgentSt
         logger.error(f"Error in complete_checkpoint_node: {e}")
         state["errors"].append(f"Checkpoint completion error: {str(e)}")
         return state
-
-async def feynman_placeholder_node(state: LearningAgentState) -> LearningAgentState:
-    """Placeholder for Feynman teaching (Milestone 3)."""
-    logger.info("📚 Feynman teaching needed...")
+        
+@trace_workflow_node("progress_to_next_checkpoint")
+async def progress_to_next_checkpoint_node(state: LearningAgentState) -> LearningAgentState:
+    """Progress to the next checkpoint in the learning path."""
+    logger.info("🚀 Progressing to next checkpoint...")
     
     try:
-        state["workflow_step"] = "feynman_needed"
+        learning_path = state["learning_path"]
+        current_index = state["current_checkpoint_index"]
         
-        checkpoint = state["current_checkpoint"]
-        score = state["score_percentage"]
+        # Set the next checkpoint as current
+        next_checkpoint = learning_path["checkpoints"][current_index]
+        state["current_checkpoint"] = next_checkpoint
         
-        # Identify failing areas
-        failing_areas = []
-        for result in state["verification_results"]:
-            if result["score"] < 0.7:
-                failing_areas.append({
-                    "question_id": result["question_id"],
-                    "score": result["score"],
-                    "feedback": result["feedback"]
-                })
+        # Reset state for new checkpoint
+        state["collected_materials"] = []
+        state["summary"] = ""
+        state["processed_context"] = []
+        state["generated_questions"] = []
+        state["verification_results"] = []
+        state["score_percentage"] = 0.0
+        state["meets_threshold"] = False
+        state["workflow_step"] = "checkpoint_initialized"
         
-        state["feynman_info"] = {
-            "trigger_score": score,
-            "failing_areas": failing_areas,
-            "explanation_needed": True,
-            "status": "placeholder_reached"
-        }
+        logger.info(f"📚 Starting checkpoint {current_index + 1}/{state['total_checkpoints']}: {next_checkpoint['title']}")
+        logger.info(f"📝 Description: {next_checkpoint['description']}")
+        logger.info(f"🎯 Requirements: {len(next_checkpoint['requirements'])} objectives")
         
-        logger.info(f"📚 Feynman teaching required for '{checkpoint['title']}'")
-        logger.info(f"📊 Score: {score:.1f}% (below 70% threshold)")
-        logger.info(f"📋 Areas needing improvement: {len(failing_areas)}")
-        logger.info("🔮 Milestone 3: Advanced teaching methods coming soon...")
-        
-        state["workflow_history"].append("feynman_placeholder")
+        state["workflow_history"].append("progress_to_next_checkpoint")
         return state
         
     except Exception as e:
-        logger.error(f"Error in feynman_placeholder_node: {e}")
-        state["errors"].append(f"Feynman placeholder error: {str(e)}")
+        logger.error(f"Error in progress_to_next_checkpoint_node: {e}")
+        state["errors"].append(f"Checkpoint progression error: {str(e)}")
         return state
+
+@trace_workflow_node("feynman_teaching")
+async def feynman_teaching_node(state: LearningAgentState) -> LearningAgentState:
+    """Apply Feynman Technique for adaptive teaching and re-assessment."""
+    logger.info("📚 Applying Feynman Teaching...")
+    
+    try:
+        state["workflow_step"] = "feynman_teaching"
+        
+        from .feynman_teaching import get_feynman_teacher
+        feynman_teacher = get_feynman_teacher()
+        
+        # Apply Feynman technique
+        should_retry, state = await feynman_teacher.apply_feynman_technique(state)
+        
+        # Mark if retry is needed
+        state["feynman_retry_requested"] = should_retry
+        
+        checkpoint = state.get("current_checkpoint", {})
+        logger.info(f"📚 Feynman teaching completed for '{checkpoint.get('title', 'Unknown')}'")
+        logger.info(f"🔄 Retry requested: {should_retry}")
+        
+        state["workflow_history"].append("feynman_teaching")
+        return state
+        
+    except Exception as e:
+        logger.error(f"Error in feynman_teaching_node: {e}")
+        state["errors"].append(f"Feynman teaching error: {str(e)}")
+        state["feynman_retry_requested"] = False
+        return state
+
+@trace_workflow_node('progress_to_next_checkpoint')
+async def progress_to_next_checkpoint_node(state):
+    '''Progress to the next checkpoint in the learning path.'''
+    logger.info('��� Progressing to next checkpoint...')
+    
+    try:
+        learning_path = state['learning_path']
+        current_index = state['current_checkpoint_index']
+        
+        # Set the next checkpoint as current
+        next_checkpoint = learning_path['checkpoints'][current_index]
+        state['current_checkpoint'] = next_checkpoint
+        
+        # Reset state for new checkpoint
+        state['collected_materials'] = []
+        state['summary'] = ''
+        state['processed_context'] = []
+        state['generated_questions'] = []
+        state['verification_results'] = []
+        state['score_percentage'] = 0.0
+        state['meets_threshold'] = False
+        state['workflow_step'] = 'checkpoint_initialized'
+        
+        logger.info(f'��� Starting checkpoint {current_index + 1}/{state["total_checkpoints"]}: {next_checkpoint["title"]}')
+        logger.info(f'��� Description: {next_checkpoint["description"]}')
+        logger.info(f'��� Requirements: {len(next_checkpoint["requirements"])} objectives')
+        
+        state['workflow_history'].append('progress_to_next_checkpoint')
+        return state
+        
+    except Exception as e:
+        logger.error(f'Error in progress_to_next_checkpoint_node: {e}')
+        state['errors'].append(f'Checkpoint progression error: {str(e)}')
+        return state
+

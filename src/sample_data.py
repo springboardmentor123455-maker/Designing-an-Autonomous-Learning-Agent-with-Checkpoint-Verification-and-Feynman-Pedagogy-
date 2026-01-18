@@ -6,7 +6,7 @@ for demonstration and testing purposes.
 """
 
 from typing import List
-from .models import Checkpoint, Material
+from .models import Checkpoint, Material, LearningPath, LearningPath
 
 def create_sample_checkpoint() -> Checkpoint:
     """Create a sample learning checkpoint."""
@@ -170,3 +170,88 @@ The choice of metric depends on the specific problem, business requirements, and
             "source": "evaluation_handbook"
         }
     ]
+
+def create_learning_paths():
+    """Create multiple complete learning paths."""
+    from .models import LearningPath
+    
+    # NLP Learning Path
+    nlp_path = {
+        "id": "nlp_complete",
+        "title": "Natural Language Processing Mastery",
+        "description": "Complete NLP learning journey from basics to advanced applications", 
+        "checkpoints": [
+            {
+                "id": "nlp_basics",
+                "title": "NLP Fundamentals",
+                "description": "Understanding core NLP concepts and text preprocessing",
+                "requirements": [
+                    "Understand text preprocessing",
+                    "Explain tokenization and stemming", 
+                    "Identify common NLP tasks"
+                ]
+            },
+            {
+                "id": "nlp_intermediate", 
+                "title": "Sentiment Analysis",
+                "description": "Building sentiment analysis systems",
+                "requirements": [
+                    "Perform sentiment analysis",
+                    "Evaluate sentiment models", 
+                    "Handle different text types"
+                ]
+            },
+            {
+                "id": "nlp_advanced",
+                "title": "Language Models",
+                "description": "Understanding and applying language models",
+                "requirements": [
+                    "Describe language model applications",
+                    "Compare different model architectures",
+                    "Implement language model solutions"
+                ]
+            }
+        ]
+    }
+    
+    # Machine Learning Path
+    ml_path = {
+        "id": "ml_complete",
+        "title": "Machine Learning Mastery", 
+        "description": "Complete ML journey from fundamentals to advanced techniques",
+        "checkpoints": [
+            {
+                "id": "ml_fundamentals",
+                "title": "ML Fundamentals",
+                "description": "Core machine learning concepts",
+                "requirements": [
+                    "Explain supervised vs unsupervised learning",
+                    "Understand basic algorithms",
+                    "Know evaluation metrics"
+                ]
+            },
+            {
+                "id": "ml_algorithms",
+                "title": "ML Algorithms", 
+                "description": "Specific machine learning algorithms",
+                "requirements": [
+                    "Implement classification algorithms",
+                    "Apply regression techniques",
+                    "Use clustering methods"
+                ]
+            },
+            {
+                "id": "ml_optimization",
+                "title": "Model Optimization",
+                "description": "Advanced model tuning and optimization",
+                "requirements": [
+                    "Perform hyperparameter tuning",
+                    "Apply cross-validation", 
+                    "Optimize model performance"
+                ]
+            }
+        ]
+    }
+    
+    return [nlp_path, ml_path]
+

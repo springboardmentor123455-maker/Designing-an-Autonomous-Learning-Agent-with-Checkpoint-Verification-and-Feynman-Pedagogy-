@@ -20,11 +20,7 @@ load_dotenv(dotenv_path=env_path)
 from .models import LearningAgentState, Checkpoint, Material
 from .workflow import create_unified_workflow
 from .sample_data import create_sample_checkpoint, create_sample_materials
-from .langsmith_config import langsmith_config, trace_document_retrieval
-from .interactive import (
-    display_welcome, select_checkpoint, display_question, 
-    display_results, get_user_evaluation, display_system_metrics
-)
+from .user_interaction import collect_user_answers, display_score_feedback
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +52,11 @@ async def run_learning_session(checkpoint: Optional[Checkpoint] = None,
             "verification_results": [],
             "score_percentage": 0.0,
             "meets_threshold": False,
+            "feynman_retry_count": 0,
+            "feynman_retry_requested": False,
+            "feynman_explanations": [],
+            "user_uploaded_notes_path": None,
+            "materials_validation": None,
             "workflow_step": "initialized",
             "workflow_history": [],
             "errors": []
@@ -115,70 +116,25 @@ async def run_learning_session(checkpoint: Optional[Checkpoint] = None,
         return {"error": str(e)}
 
 async def interactive_mode():
-    """Run the system in interactive mode with user questions."""
-    display_welcome()
+    """Run a simple interactive learning session."""
+    print("\n" + "="*60)
+    print("Learning Agent System - Single Session Mode")
+    print("="*60)
+    print("\nFor multi-checkpoint sessions, use: python -m src.multi_checkpoint")
+    print("For web interface, use: streamlit run app.py")
     
-    # Checkpoint selection
-    selected_checkpoint = select_checkpoint()
-    if not selected_checkpoint:
-        return
+    # Use default checkpoint
+    selected_checkpoint = create_sample_checkpoint()
+    print(f"\n🚀 Starting: {selected_checkpoint['title']}")
     
-    # Run the learning session with user interaction
-    print(f"\n🚀 Starting learning session for: {selected_checkpoint['title']}")
-    print("⏳ Processing learning materials...")
+    # Run the session
+    result = await run_learning_session(selected_checkpoint, create_sample_materials())
     
-    # Initialize state for interactive session
-    initial_state = {
-        "current_checkpoint": selected_checkpoint,
-        "collected_materials": create_sample_materials(),
-        "workflow_history": [],
-        "errors": [],
-        "workflow_step": "starting",
-        "milestone1_score": 0.0,
-        "score_percentage": 0.0,
-        "meets_threshold": False,
-        "user_mode": "interactive"
-    }
+    if result.get('score_percentage') is not None:
+        print(f"\n📊 Final Score: {result['score_percentage']:.1f}%")
+        print(f"✓ Passed" if result.get('meets_threshold') else "✗ Below Threshold")
     
-    try:
-        # Create and run workflow
-        workflow = create_unified_workflow()
-        result = await workflow.ainvoke(initial_state)
-        
-        # Interactive question answering if questions were generated
-        if result.get('generated_questions'):
-            print(f"\n🎯 Time for your assessment!")
-            print(f"You will answer {len(result['generated_questions'])} questions.")
-            input("\nPress Enter when ready to begin...")
-            
-            # Collect user answers
-            user_answers = []
-            for i, question in enumerate(result['generated_questions'], 1):
-                answer = display_question(question, i, len(result['generated_questions']))
-                user_answers.append({
-                    "question": question,
-                    "user_answer": answer,
-                    "timestamp": "interactive_mode"
-                })
-            
-            # Process answers and update results
-            result['user_answers'] = user_answers
-            result = await process_user_answers(result)
-        
-        # Display comprehensive results
-        display_results(result, selected_checkpoint['title'])
-        
-        # Get user evaluation feedback
-        feedback = get_user_evaluation()
-        
-        # Display system performance metrics
-        display_system_metrics(feedback)
-        
-        return result
-        
-    except Exception as e:
-        print(f"\n❌ Error during interactive session: {e}")
-        logger.error(f"Interactive mode error: {e}")
+    return result
 
 async def process_user_answers(result: Dict) -> Dict:
     """Process user answers and calculate scores."""

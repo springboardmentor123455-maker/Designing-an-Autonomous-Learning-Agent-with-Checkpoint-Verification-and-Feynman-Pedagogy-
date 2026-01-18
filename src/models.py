@@ -5,7 +5,7 @@ This module contains all TypedDict definitions and data models used
 throughout the learning agent workflow.
 """
 
-from typing import List, Dict, Any, TypedDict
+from typing import List, Dict, Any, TypedDict, Optional
 
 class Checkpoint(TypedDict):
     """Learning checkpoint definition."""
@@ -49,8 +49,21 @@ class VerificationResult(TypedDict):
     feedback: str
     scoring_details: Dict[str, Any]
 
+class LearningPath(TypedDict):
+    """Complete learning path with multiple checkpoints."""
+    id: str
+    title: str
+    description: str
+    checkpoints: List[Checkpoint]
+
 class LearningAgentState(TypedDict):
     """Complete state for the learning agent workflow."""
+    # Learning Path Management
+    learning_path: LearningPath
+    current_checkpoint_index: int
+    completed_checkpoints: List[str]
+    total_checkpoints: int
+    
     # Milestone 1 state
     current_checkpoint: Checkpoint
     collected_materials: List[Material]
@@ -63,6 +76,15 @@ class LearningAgentState(TypedDict):
     verification_results: List[VerificationResult]
     score_percentage: float
     meets_threshold: bool
+    
+    # Feynman Teaching (Milestone 3)
+    feynman_retry_count: int
+    feynman_retry_requested: bool
+    feynman_explanations: List[Dict[str, Any]]
+    
+    # User Materials & Validation
+    user_uploaded_notes_path: Optional[List[str]]
+    materials_validation: Optional[Dict[str, Any]]
     
     # Workflow management
     workflow_step: str

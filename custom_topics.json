@@ -1,0 +1,36 @@
+[
+  {
+    "id": "test_minimal",
+    "title": "Test Topic",
+    "description": "A test topic for verification",
+    "checkpoints": [
+      {
+        "id": "test_minimal_main",
+        "title": "Test Topic",
+        "description": "A test topic for verification",
+        "requirements": [
+          "Understand the fundamentals of Test Topic",
+          "Apply key concepts from Test Topic",
+          "Demonstrate knowledge of Test Topic"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "quick_test",
+    "title": "Quick Test",
+    "description": "Test description",
+    "checkpoints": [
+      {
+        "id": "quick_test_main",
+        "title": "Quick Test",
+        "description": "Test description",
+        "requirements": [
+          "Learn basics",
+          "Apply concepts",
+          "Demonstrate knowledge"
+        ]
+      }
+    ]
+  }
+]

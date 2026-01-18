@@ -34,15 +34,13 @@ from .workflow_nodes import (
     verify_understanding_node,
     check_threshold_node,
     complete_checkpoint_node,
-    feynman_placeholder_node
+    feynman_teaching_node
 )
-from .workflow import create_unified_workflow
+from .workflow import create_unified_workflow, create_question_generation_workflow
 from .main import run_learning_session, interactive_mode, process_user_answers
-from .sample_data import create_sample_checkpoint, create_sample_materials, create_multiple_checkpoints
-from .interactive import (
-    display_welcome, select_checkpoint, display_question, 
-    display_results, get_user_evaluation, display_system_metrics
-)
+from .sample_data import create_sample_checkpoint, create_sample_materials, create_multiple_checkpoints, create_learning_paths
+from .custom_topics import load_custom_topics, add_custom_topic, create_topic_wizard
+from .multi_checkpoint import run_multi_checkpoint_session
 
 __all__ = [
     # Models
@@ -66,7 +64,7 @@ __all__ = [
     'verify_understanding_node',
     'check_threshold_node',
     'complete_checkpoint_node',
-    'feynman_placeholder_node',
+    'feynman_teaching_node',
 
     
     # Workflow and execution
@@ -74,17 +72,14 @@ __all__ = [
     'run_learning_session',
     'interactive_mode',
     'process_user_answers',
+    'run_multi_checkpoint_session',
     
-    # Sample data
+    # Sample data and custom topics
     'create_sample_checkpoint',
     'create_sample_materials',
     'create_multiple_checkpoints',
-    
-    # Interactive functions
-    'display_welcome',
-    'select_checkpoint', 
-    'display_question',
-    'display_results',
-    'get_user_evaluation',
-    'display_system_metrics'
+    'create_learning_paths',
+    'load_custom_topics',
+    'add_custom_topic',
+    'create_topic_wizard'
 ]
