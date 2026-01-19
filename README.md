@@ -1,12 +1,12 @@
 # Designing-an-Autonomous-Learning-Agent-with-Checkpoint-Verification-and-Feynman-Pedagogy-
 
-## 📌 Project Overview
+## Project Overview
 This project is an **Autonomous AI Tutor** designed to create personalized learning paths, teach complex technical concepts, and enforce mastery through rigorous assessment. Unlike standard chatbots, this system uses an **Adaptive Feedback Loop**: if a student fails a quiz, the agent switches to "Feynman Mode," re-teaching the specific weak concepts using simple analogies before re-testing.
 
 The system is built on a **Retrieval-Augmented Generation (RAG)** architecture, allowing it to teach from both general web knowledge and specific user-uploaded documents.
 
 ---
-## 🏗️ System Architecture
+## System Architecture
 
 The agent operates on a cyclic graph architecture to ensure mastery:
 
@@ -29,7 +29,7 @@ graph TD
     L --> G
 ```
 
-## 📂 File Documentation
+## File Documentation
 
 ### 1. `app.py` (The Interactive Frontend)
 **Role:** The production-ready User Interface built with Streamlit.
@@ -55,7 +55,7 @@ This notebook contains the **LangGraph** implementation, demonstrating the compl
 * **Strict Grading Node (Cell 14):** Implements the logic to penalize vague answers and identify specific "failed concepts" for remediation.
 * **LangGraph Workflow (Cell 10 & 17):** Compiles the state graph (`StateGraph`) with conditional edges that determine whether to Pass, Fail, Retry, or Search.
 
-## 🚀 Key Features
+## Key Features
 1. **Hybrid RAG:** Intelligently switches between User Documents and DuckDuckGo Web Search.
 
 2. **Self-Correction:** The AI evaluates its own lesson quality before showing it to the user.
@@ -67,7 +67,7 @@ This notebook contains the **LangGraph** implementation, demonstrating the compl
 ## ⚙️ Setup & Installation
 
 **Prerequisites:**
-* Python 3.10+
+* Python 3+
 * API Keys: Groq, LangSmith (Optional)
 
 **Installation:**
@@ -87,7 +87,7 @@ pip install streamlit langchain-groq langchain-huggingface langchain-community p
 ```bash
 streamlit run app.py
 ```
-## 🖥️ Usage Guide
+## Usage Guide
 
 1. **Configuration:** Enter your Groq API Key in the sidebar.
 
