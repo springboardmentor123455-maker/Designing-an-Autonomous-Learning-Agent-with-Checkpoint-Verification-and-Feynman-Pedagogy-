@@ -64,7 +64,7 @@ This notebook contains the **LangGraph** implementation, demonstrating the compl
 
 4. **Persistent Memory:** In app.py, st.session_state is used to track progress across the 5-module curriculum.
 
-## ⚙️ Setup & Installation
+## Setup & Installation
 
 **Prerequisites:**
 * Python 3+
