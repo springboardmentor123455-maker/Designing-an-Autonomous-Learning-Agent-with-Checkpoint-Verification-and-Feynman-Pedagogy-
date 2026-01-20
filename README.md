@@ -47,14 +47,16 @@ This project demonstrates how **agentic AI workflows** can be applied to educati
 ---
 
 ## 🏗️ System Architecture
-        Checkpoint Initialization ↓  
-Context Preparation ↓  
-Question Generation ↓  
-User Responses ↓  
-Answer Evaluation ↓  
-Score ≥ 70% → Next Checkpoint ↓  
-Feynman Explanation (Simplified Teaching) ↓  
+
+Checkpoint Initialization ↓<br>
+Context Preparation ↓<br>
+Question Generation ↓<br>
+User Responses ↓<br>
+Answer Evaluation ↓<br>
+Score ≥ 70% → Next Checkpoint ↓<br>
+Feynman Explanation (Simplified Teaching) ↓<br>
 Re-Assessment
+
 
 
 
