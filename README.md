@@ -1,30 +1,69 @@
-# Designing-an-Autonomous-Learning-Agent-with-Checkpoint-Verification-and-Feynman-Pedagogy-
+# Designing an Autonomous Learning Agent with Checkpoint Verification and Feynman Pedagogy
 
 # 🧠 Adaptive AI Tutor (LangGraph + Groq + Tavily + Streamlit)
 
-An **Adaptive AI Tutor** that teaches concepts step-by-step, generates short test questions, evaluates answers, and if the learner fails, it automatically switches to **Feynman Technique** teaching mode and re-tests again.
+An **Adaptive AI Tutor** that teaches concepts step-by-step, generates short test questions, evaluates learner answers, and if the learner struggles, it automatically switches to **Feynman Technique** teaching mode and re-tests until mastery (or attempts run out).
 
-This project uses:
+This project is designed as a complete learning pipeline that includes:
 
-- **LangGraph** for agent workflow + state handling
-- **Groq LLM (LangChain Groq)** for tutoring + question generation + grading
-- **Tavily Search** for web-based learning content
-- **SentenceTransformers embeddings** for semantic chunk retrieval (temporary vector store)
-- **Streamlit UI** for interactive learning and testing
+- 📚 **Content generation + enrichment**
+- 🧩 **Chunking + semantic retrieval**
+- 📝 **Adaptive questioning**
+- ✅ **Checkpoint verification**
+- 🧠 **Feynman remediation**
+- 🎛️ **Streamlit UI**
+
+---
+
+## ✨ Key Technologies Used
+
+- **LangGraph** → workflow orchestration + state-based agent execution  
+- **Groq LLM (LangChain Groq)** → explanation writing, question generation, answer scoring  
+- **Tavily Search** → fetches web content as learning context  
+- **SentenceTransformers + NumPy** → embeddings + semantic retrieval for better grading  
+- **PyPDF2** → optional PDF reading support  
+- **ReportLab** → optional PDF export for raw LLM logs  
+- **Streamlit** → frontend UI for interactive learning  
 
 ---
 
 ## 🚀 Features
 
-- ✅ Select a checkpoint topic (or enter a custom topic)
-- ✅ Automatically fetches learning content from the web (Tavily)
-- ✅ Merges user notes + generated context into one clean explanation
-- ✅ Splits context into chunks + builds a temporary vector store
-- ✅ Generates **3 short beginner questions** (max 18 words)
-- ✅ Grades answers using a strict scoring bucket: **0 / 40 / 70 / 100**
-- ✅ If score is low → enters **Feynman Teaching Mode** and retries
-- ✅ Attempts limit included (default: 3)
-- ✅ Optional raw LLM logging + PDF export support
+### 🎯 Learning & Teaching
+- ✅ Select a checkpoint topic (or choose **Custom Topic**)
+- ✅ Generates structured learning content based on objectives
+- ✅ Supports optional learner notes (used to enrich final context)
+- ✅ Fetches trusted web content automatically using Tavily
+- ✅ Summarizes large content to keep it clean and relevant
+
+### 🧩 Context Processing
+- ✅ Splits content into overlapping chunks (chunking strategy)
+- ✅ Builds a temporary in-memory vector store using embeddings
+- ✅ Retrieves the top-k most relevant chunks for question generation & grading
+
+### 📝 Adaptive Testing
+- ✅ Generates **exactly 3 short questions**
+- ✅ Questions follow strict rules:
+  - 1 sentence only
+  - Max 18 words
+  - Beginner-friendly
+  - Must end with `?`
+- ✅ Uses different question styles across attempts (role / process / why / application)
+
+### ✅ Answer Evaluation
+- ✅ Rejects answers that are too short (less than 30 characters)
+- ✅ Rejects unrelated answers using keyword overlap guard
+- ✅ Scores answers strictly using buckets:
+  - **0** → wrong/unrelated
+  - **40** → partial understanding
+  - **70** → correct with small gaps
+  - **100** → fully correct
+
+### 🧠 Feynman Teaching Mode
+- ✅ Automatically activates if the learner fails
+- ✅ Generates simplified teaching focused only on weak concepts
+- ✅ Re-tests learner with new questions
+- ✅ Attempts are limited (default: 3)
 
 ---
 
@@ -39,6 +78,39 @@ adaptive-ai-tutor/
 └── README.md           # Documentation
 ```
 
+---
+
+## ⚙️ Setup Instructions (Windows Only)
+
+### 1️⃣ Clone the Repository
+
+```bash
+git clone https://github.com/your-username/adaptive-ai-tutor.git
+cd adaptive-ai-tutor
+```
+
+---
+
+### 2️⃣ Create Virtual Environment (Recommended)
+
+```bash
+python -m venv venv
+```
+
+Activate it:
+
+```bash
+venv\Scripts\activate
+```
+
+If activation works, you will see something like:
+
+```text
+(venv)
+```
+
+---
+
 ### 3️⃣ Install Dependencies
 
 ```bash
@@ -47,7 +119,7 @@ pip install -r requirements.txt
 
 ---
 
-## 📦 requirements.txt
+## 📦 requirements.txt (Example)
 
 Create a `requirements.txt` like this:
 
@@ -68,11 +140,15 @@ ipython
 
 ## 🔑 Environment Variables (IMPORTANT)
 
-This project requires API keys for Groq + Tavily (and optional LangSmith).
+This project requires API keys for:
 
-### Option A (Recommended): Export in Terminal
+- **Groq** → LLM inference  
+- **Tavily** → web search context  
+- **LangSmith** (optional) → tracing & debugging  
 
-**Windows (PowerShell)**
+### ✅ Recommended: Set Keys in Windows PowerShell
+
+Open PowerShell and run:
 
 ```powershell
 $env:GROQ_API_KEY="YOUR_TOKEN"
@@ -81,22 +157,22 @@ $env:LANGSMITH_TRACING="true"
 $env:LANGSMITH_API_KEY="YOUR_TOKEN"
 ```
 
-**Mac/Linux**
-
-```bash
-export GROQ_API_KEY="YOUR_TOKEN"
-export TAVILY_API_KEY="YOUR_TOKEN"
-export LANGSMITH_TRACING="true"
-export LANGSMITH_API_KEY="YOUR_TOKEN"
-```
-
-### Option B: Put inside `backend.py` (Not recommended for GitHub)
-
-⚠️ Do not upload tokens to GitHub.
+⚠️ These keys apply only to the current terminal session.
 
 ---
 
-## ▶️ Run the App (Streamlit)
+### ❌ Do NOT Put Tokens Inside backend.py
+
+Do not commit tokens to GitHub:
+
+- Never push keys in code
+- Never upload `.env` files with real secrets
+
+---
+
+## ▶️ Run the Streamlit App
+
+Start the UI:
 
 ```bash
 streamlit run app.py
@@ -110,92 +186,151 @@ http://localhost:8501
 
 ---
 
-## 🧪 Run Backend in Interactive Mode (CLI)
+## 🧪 Run Backend in Terminal Mode (Optional)
 
-You can also run the backend in terminal mode:
+You can run the backend without Streamlit:
 
 ```bash
 python backend.py
 ```
 
-It will ask:
+It will ask you to choose:
 
-- `1` → interactive learning run (generate questions & answer interactively)
-- `2` → evaluation suite (automated test)
-
----
-
-## 📌 Learning Flow (How it Works)
-
-1. **Checkpoint selected**
-2. **Context gathered**
-   - user notes (optional)
-   - PDFs (optional)
-   - web search (always)
-3. **Context validated**
-   - semantic relevance filter using embeddings
-4. **Chunking + vector store**
-   - chunks are embedded using SentenceTransformer
-5. **Question generation**
-   - 3 questions (18 words max)
-6. **Answer verification**
-   - overlap check + LLM grading
-7. **Feynman remediation**
-   - if score < threshold → simplified teaching
-8. **Retry loop**
-   - repeats until passed or attempts exhausted
+- `1` → interactive learning run (answer questions manually)
+- `2` → evaluation suite (automated testing)
 
 ---
 
-## 🧠 How the Tutor Scores Answers
+## 📌 How the Tutor Works (Pipeline Overview)
 
-Each answer is graded into one of these buckets:
+### Step 1: Checkpoint Selection
+User selects a checkpoint like:
 
-- **0** → wrong or unrelated
+- CP1 — Basics of Neural Networks
+- CP2 — Loss Functions
+- ...
+- CP10 — Regularization Techniques
+
+Or selects **Custom Topic**.
+
+---
+
+### Step 2: Context Gathering
+The tutor gathers learning content from:
+
+- **User notes** (optional)
+- **PDFs** (optional, supported in backend)
+- **Web search** (always enabled via Tavily)
+
+Then it merges everything into one clean explanation.
+
+---
+
+### Step 3: Context Validation
+The system checks relevance using embeddings:
+
+- If content is unrelated → it refetches from the web
+- It also scores coverage of objectives (1–5)
+
+---
+
+### Step 4: Chunking + Temporary Vector Store
+The context is split into chunks:
+
+- Chunk size: **1200**
+- Overlap: **250**
+- Minimum chunk length: **300**
+
+Embeddings are generated using:
+
+- `all-MiniLM-L6-v2`
+
+This allows top-k retrieval for grading.
+
+---
+
+### Step 5: Question Generation
+The tutor generates 3 questions per attempt:
+
+- Short and simple
+- Different style per attempt
+- Focused on weak concepts
+
+---
+
+### Step 6: Answer Verification
+Each answer is checked using:
+
+1. **Short answer filter**
+2. **Keyword overlap guard**
+3. **LLM-based scoring bucket**
+
+Final pass condition:
+
+- All answers must score **>= 70**
+
+---
+
+### Step 7: Feynman Remediation (If Failed)
+If learner fails:
+
+- Tutor explains only the weak concepts
+- Uses simple step-by-step teaching
+- Generates new questions again
+- Repeats until pass or attempts finish
+
+---
+
+## 🧠 Scoring System
+
+Each answer gets one of:
+
+- **0** → wrong/unrelated
 - **40** → partial understanding
 - **70** → correct with minor gaps
 - **100** → fully correct
 
-Passing condition:
+Overall score is average of the 3 answers.
 
-- All questions must score **>= 70**
+Passing rule:
+
+- Must score **>= 70 on all questions**
 
 ---
 
 ## 🧩 Checkpoints Included
 
-Currently included checkpoints:
+The current learning path includes:
 
-- CP1 — Basics of Neural Networks
-- CP2 — Loss Functions
-- CP3 — Gradient Descent
-- CP4 — Learning Rate
-- CP5 — Activation Functions
-- CP6 — Backpropagation
-- CP7 — Overfitting and Generalization
-- CP8 — Train Validation and Test Data
-- CP9 — Weight Initialization
-- CP10 — Regularization Techniques
-
-You can also select **➕ Custom Topic** in the sidebar and enter any topic name.
+- CP1 — Basics of Neural Networks  
+- CP2 — Loss Functions  
+- CP3 — Gradient Descent  
+- CP4 — Learning Rate  
+- CP5 — Activation Functions  
+- CP6 — Backpropagation  
+- CP7 — Overfitting and Generalization  
+- CP8 — Train Validation and Test Data  
+- CP9 — Weight Initialization  
+- CP10 — Regularization Techniques  
 
 ---
 
 ## 🛡️ Notes & Security
 
-- Never commit API keys to GitHub.
-- Use environment variables or Streamlit secrets.
-- Web search is performed using Tavily, so results depend on internet + query.
+- Never commit API keys to GitHub
+- Always use environment variables
+- Web results depend on Tavily + internet
+- Scoring is strict by design to encourage real understanding
 
 ---
 
 ## 🌟 Future Improvements
 
-- Add PDF upload inside Streamlit UI
-- Save learner progress per checkpoint
-- Add more checkpoints and difficulty levels
-- Add voice-based learning mode
-- Add database support for user sessions
+- Add PDF upload option inside Streamlit UI
+- Add progress tracking per checkpoint
+- Add difficulty levels (Beginner / Intermediate / Advanced)
+- Add database support for multi-user learning sessions
+- Add better UI analytics (weak topics chart)
 
 ---
 
