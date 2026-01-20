@@ -54,11 +54,7 @@ This project is designed as a complete learning pipeline that includes:
 - ✅ Rejects answers that are too short (less than 30 characters)
 - ✅ Rejects unrelated answers using keyword overlap guard
 - ✅ Scores answers strictly using buckets:
-  - **0** → wrong/unrelated
-  - **40** → partial understanding
-  - **70** → correct with small gaps
-  - **100** → fully correct
-
+ 
 ### 🧠 Feynman Teaching Mode
 - ✅ Automatically activates if the learner fails
 - ✅ Generates simplified teaching focused only on weak concepts
@@ -161,14 +157,6 @@ $env:LANGSMITH_API_KEY="YOUR_TOKEN"
 
 ---
 
-### ❌ Do NOT Put Tokens Inside backend.py
-
-Do not commit tokens to GitHub:
-
-- Never push keys in code
-- Never upload `.env` files with real secrets
-
----
 
 ## ▶️ Run the Streamlit App
 
