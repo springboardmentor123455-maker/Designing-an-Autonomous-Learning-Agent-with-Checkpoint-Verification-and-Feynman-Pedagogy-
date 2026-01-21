@@ -85,8 +85,8 @@ This simulates **teaching a concept as if explaining to a beginner**, reinforcin
 - Learners **cannot skip checkpoints**
 - Progress tracked using session state
 - Supports:
-  - Predefined topics (e.g., Machine Learning)
-  - Dynamic topics (fallback supported)
+  - Predefined topics
+  - Dynamic topics 
 
 The learning path completes **only after all checkpoints are passed**.
 
@@ -109,6 +109,7 @@ Answer Verification
 Score ≥ 70% ?
    ├── Yes → Next Checkpoint
    └── No  → Feynman Explanation → Retry
+```
 
 ---
 
@@ -126,9 +127,6 @@ Score ≥ 70% ?
 
 ---
 
-## ✅ FIX 1: PROJECT STRUCTURE (PERFECTLY ALIGNED)
-
-```markdown
 ## 📂 Project Structure
 
 ```text
@@ -165,13 +163,16 @@ Designing-an-Autonomous-Learning-Agent-with-Checkpoint-Verification-and-Feynman-
 └── utils/                    # Supporting utilities
     ├── dynamic_checkpoints.py
     └── output.py
+```
+
 ---
 
 ## 🚀 How to Run the Project
 
-## 1️⃣ Install dependencies
-
+### 1️⃣ Install dependencies
+```bash
 pip install -r requirements.txt
+```
 
 ## 2️⃣ Configure environment variables
 
