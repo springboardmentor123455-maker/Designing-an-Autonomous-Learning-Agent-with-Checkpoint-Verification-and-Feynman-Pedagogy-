@@ -92,22 +92,23 @@ The learning path completes **only after all checkpoints are passed**.
 
 ---
 
+```markdown
 ## 🧠 System Architecture (High Level)
 
+```text
 Select Topic
-↓
+      ↓
 Gather Context (Notes / Web)
-↓
+      ↓
 Validate Context
-↓
+      ↓
 Generate Questions
-↓
+      ↓
 Answer Verification
-↓
+      ↓
 Score ≥ 70% ?
-├── Yes → Next Checkpoint
-└── No → Feynman Explanation → Retry
-
+   ├── Yes → Next Checkpoint
+   └── No  → Feynman Explanation → Retry
 
 ---
 
@@ -125,8 +126,12 @@ Score ≥ 70% ?
 
 ---
 
+## ✅ FIX 1: PROJECT STRUCTURE (PERFECTLY ALIGNED)
+
+```markdown
 ## 📂 Project Structure
 
+```text
 Designing-an-Autonomous-Learning-Agent-with-Checkpoint-Verification-and-Feynman-Pedagogy-/
 │
 ├── app.py                    # Streamlit UI (entry point)
@@ -160,29 +165,26 @@ Designing-an-Autonomous-Learning-Agent-with-Checkpoint-Verification-and-Feynman-
 └── utils/                    # Supporting utilities
     ├── dynamic_checkpoints.py
     └── output.py
-
 ---
 
 ## 🚀 How to Run the Project
 
-## 🚀 How to Run the Project
-
-### 1️⃣ Install dependencies
+## 1️⃣ Install dependencies
 
 pip install -r requirements.txt
 
-2️⃣ Configure environment variables
+## 2️⃣ Configure environment variables
 
 Create a .env file in the project root:
 
 GROQ_API_KEY=your_api_key_here
 TAVILY_API_KEY=your_api_key_here
 
-3️⃣ Run the application
+##3️⃣ Run the application
 streamlit run app.py
 
 
-📊 Evaluation Criteria
+##📊 Evaluation Criteria
 
 Checkpoint-wise assessment
 
@@ -192,12 +194,12 @@ Adaptive retry using Feynman explanations
 
 Strict sequential progression enforcement
 
-🙏 Conclusion
+##🙏 Conclusion
 
 This project demonstrates how AI can function as a responsible educational assistant, prioritizing understanding over shortcuts.
 
 By combining LLMs, structured workflows, and pedagogical principles, the Autonomous Learning Agent delivers a meaningful and mastery-driven learning experience.
 
-👩‍💻 Author
+##👩‍💻 Author
 
 Nisha Murali
