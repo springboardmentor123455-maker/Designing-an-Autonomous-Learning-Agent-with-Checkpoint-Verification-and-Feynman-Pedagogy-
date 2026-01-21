@@ -375,19 +375,6 @@ python main.py
 
 ---
 
-### Data Flow
-
-```mermaid
-graph TD
-    A[User Input] --> B[Define Checkpoint]
-    B --> C[Gather Context]
-    C --> D[Web Search]
-    D --> E[Chunk Text]
-    E --> F[Create Embeddings]
-    F --> G[Generate Questions]
-    G --> H[User Answers]
-    H --> I[Evaluate Answers]
-    � Architecture
 
 ### High-Level System Design
 
@@ -717,18 +704,6 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **Richard Feynman** - Teaching methodology inspiration
 
 ---
-
-## 📊 Project Statistics
-
-| Metric | Value |
-|--------|-------|
-| **Total Code** | 4,500+ lines |
-| **Components** | 15+ classes |
-| **Workflow Nodes** | 8 specialized nodes |
-| **Dependencies** | 20+ packages |
-| **Documentation** | 3 comprehensive files |
-| **Development Time** | 4 milestone phases |
-
 ---
 
 ## 🎯 Quick Reference
