@@ -173,34 +173,33 @@ Designing-an-Autonomous-Learning-Agent-with-Checkpoint-Verification-and-Feynman-
 ```bash
 pip install -r requirements.txt
 ```
+### 2️⃣ Configure environment variables
 
-## 2️⃣ Configure environment variables
+Create a `.env` file in the project root:
 
-Create a .env file in the project root:
-
+```env
 GROQ_API_KEY=your_api_key_here
 TAVILY_API_KEY=your_api_key_here
+```
 
-##3️⃣ Run the application
+### 3️⃣ Run the application
+```bash
 streamlit run app.py
+```
 
+## 📊 Evaluation Criteria
 
-##📊 Evaluation Criteria
+- Checkpoint-wise assessment
+- 70% mastery threshold
+- Adaptive retry using Feynman explanations
+- Strict sequential progression enforcement
 
-Checkpoint-wise assessment
-
-70% mastery threshold
-
-Adaptive retry using Feynman explanations
-
-Strict sequential progression enforcement
-
-##🙏 Conclusion
+## 🙏 Conclusion
 
 This project demonstrates how AI can function as a responsible educational assistant, prioritizing understanding over shortcuts.
 
 By combining LLMs, structured workflows, and pedagogical principles, the Autonomous Learning Agent delivers a meaningful and mastery-driven learning experience.
 
-##👩‍💻 Author
+## 👩‍💻 Author
 
-Nisha Murali
+**Nisha Murali**
