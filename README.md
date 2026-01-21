@@ -163,14 +163,12 @@ Designing-an-Autonomous-Learning-Agent-with-Checkpoint-Verification-and-Feynman-
 
 ---
 
----
-
 ## 🚀 How to Run the Project
 
 ## 🚀 How to Run the Project
 
 ### 1️⃣ Install dependencies
-```bash
+
 pip install -r requirements.txt
 
 2️⃣ Configure environment variables
