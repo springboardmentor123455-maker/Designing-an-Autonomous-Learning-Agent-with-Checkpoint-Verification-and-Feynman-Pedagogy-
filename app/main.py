@@ -200,11 +200,10 @@ def feynman_stage():
     col1, col2 = st.columns(2)
     with col1:
         if st.button("Try Again"):
-            state.questions.clear()
             state.responses.clear()
             state.flow_state = "quiz"
             st.rerun()
-
+            
     with col2:
         if st.button("View Result"):
             state.flow_state = "result"

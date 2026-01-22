@@ -18,6 +18,7 @@ if langsmith_api_key:
     os.environ["LANGSMITH_ENDPOINT"] = os.getenv("LANGSMITH_ENDPOINT", "https://api.smith.langchain.com")
     os.environ["LANGSMITH_PROJECT"] = os.getenv("LANGSMITH_PROJECT") or os.getenv("LANGCHAIN_PROJECT", "AI-Study-System")
 
+
 from huggingface_hub import InferenceClient
 from langchain_huggingface import HuggingFaceEmbeddings
 from tavily import TavilyClient
@@ -125,86 +126,74 @@ class Checkpoint:
 CHECKPOINTS: List[Checkpoint] = [
     Checkpoint(
         id="cp1",
-        topic="Basics of Neural Networks",
+        topic="Introduction to Generative AI",
         objectives=[
-            "Explain what a neuron is in a neural network",
-            "Describe how weights and bias affect the output",
-            "Define an activation function and its purpose",
+            "Define Generative AI and how it differs from traditional AI",
+            "Identify common examples of Generative AI systems",
+            "Understand why Generative AI is important today"
         ]
     ),
     Checkpoint(
         id="cp2",
-        topic="Forward Propagation",
+        topic="Large Language Models (LLMs)",
         objectives=[
-            "How input data go through all the layers?",
-            "Calculate output for simple 2-layer network?"
+            "Explain what a Large Language Model is",
+            "Understand how LLMs are trained on large datasets",
+            "Identify popular LLMs such as GPT, LLaMA, and Gemini"
         ]
     ),
     Checkpoint(
         id="cp3",
-        topic="Loss Function",
+        topic="Prompt Engineering",
         objectives=[
-            "What loss function actually measure?",
-            "Difference between training loss and accuracy explain?"
+            "Understand what a prompt is",
+            "Learn how prompt phrasing affects output",
+            "Differentiate zero-shot, one-shot, and few-shot prompting"
         ]
     ),
     Checkpoint(
         id="cp4",
-        topic="Backpropagation",
+        topic="Agentic AI Concepts",
         objectives=[
-            "Explain how backpropagation works in neural networks",
-            "Describe the role of chain rule in calculating gradients",
-            "How errors propagate backward through the network?"
+            "Understand what an AI agent is",
+            "Difference between LLMs and Agentic AI",
+            "Role of tools, memory, and decision-making"
         ]
     ),
     Checkpoint(
         id="cp5",
-        topic="Gradient Descent Optimization",
+        topic="Applications & Ethics of Generative AI",
         objectives=[
-            "Explain the concept of gradient descent",
-            "What is learning rate and how does it affect training?",
-            "Difference between batch, mini-batch, and stochastic gradient descent?"
-        ]
-    ),
-    Checkpoint(
-        id="cp6",
-        topic="Regularization Techniques",
-        objectives=[
-            "What is overfitting and why does it happen?",
-            "Explain L1 and L2 regularization methods",
-            "How does dropout help prevent overfitting?"
+            "Applications of GenAI in education and development",
+            "Ethical risks and limitations of GenAI",
+            "Importance of responsible AI usage"
         ]
     )
 ]
 
+
 # MILESTONE 1: User-provided notes
-USER_NOTES: Dict[str, str] = {
+USER_NOTES = {
     "cp1": """
-Neural network have many neurons in layers. Each neuron take inputs, multiply
-them with weights, add bias, then put through activation function like ReLU
-or sigmoid. Weights tell how much each input important, bias give little
-adjustment. Activation function make it non-linear so model can learn
-complex patterns not just straight lines.
+Generative AI refers to AI systems that can create new content such as text,
+images, audio, or code. Unlike traditional AI that focuses on prediction or
+classification, GenAI focuses on generation. Examples include ChatGPT,
+DALL·E, and GitHub Copilot. GenAI is widely used today because it improves
+productivity and enables natural human-computer interaction.
+    """,
+    "cp3": """
+Prompt engineering is the practice of designing effective inputs for
+large language models. The wording, structure, and clarity of prompts
+directly affect the quality of output. Techniques include zero-shot,
+one-shot, and few-shot prompting, which guide models using examples.
     """,
     "cp4": """
-Backpropagation is the algorithm used to train neural networks by calculating
-gradients. It works by computing the error at the output layer and then
-propagating it backward through the network using the chain rule. Each layer
-receives error signal and calculates how much each weight contributed to the
-error. This way we know which weights to adjust and by how much. The chain
-rule lets us multiply partial derivatives together to get the gradient for
-weights in earlier layers.
-    """,
-    "cp5": """
-Gradient descent is optimization algorithm that updates weights to minimize
-loss function. Learning rate controls how big steps we take - too big means
-we might overshoot minimum, too small means training very slow. Batch gradient
-descent uses all training data for each update which is stable but slow.
-Stochastic gradient descent (SGD) uses one sample at a time which is noisy
-but fast. Mini-batch is middle ground using small batches like 32 or 64
-samples, giving good balance of speed and stability.
+Agentic AI systems extend LLMs by enabling them to take actions using tools,
+memory, and decision-making logic. Unlike passive LLMs, agents can plan,
+reason, and execute tasks autonomously by interacting with external systems.
     """
 }
+
 
 # MILESTONE 4: STATE MANAGEMENT FOR SEAMLESS MULTI-CHECKPOINT PROGRESSION
 
@@ -575,8 +564,9 @@ def grade_answers(checkpoint_obj, material, questions, answers):
 
 # UI Components
 def render_header():
-    st.title("Neural Networks Study System")
+    st.title("🧭GenAI Learning Navigator")
     st.markdown("---")
+
 
 # MILESTONE 4: CHECKPOINT SELECTION & SEQUENTIAL PROGRESSION
 def render_checkpoint_selection():
@@ -677,25 +667,7 @@ def render_quiz():
         )
         st.session_state.answers[idx] = answer
         
-        # Hint button
-        if st.button("Get Hint", key=f"hint_btn_{idx}"):
-            st.session_state.show_hint[idx] = True
-            st.rerun()
-        
-        # Display hint if requested
-        if st.session_state.show_hint.get(idx, False):
-            with st.expander("Hint", expanded=True):
-                # Check if hint is already cached
-                if idx not in st.session_state.hints_cache:
-                    with st.spinner("Generating hint..."):
-                        hint = get_rag_hint(st.session_state.search_index, question, cp.topic)
-                        st.session_state.hints_cache[idx] = hint
-                else:
-                    hint = st.session_state.hints_cache[idx]
-                
-                st.info(hint)
-        
-        st.markdown("---")
+
     
     if st.button("Submit Quiz", type="primary", use_container_width=True):
         # Check all answers provided and not empty
@@ -776,22 +748,21 @@ def render_feynman_teaching():
     col1, col2 = st.columns(2)
     
     with col1:
-        if st.button(" Retake Quiz (with new questions)", type="primary", use_container_width=True):
-            # MILESTONE 3: Track retry attempts per checkpoint
+        if st.button("Reattempt Same Questions", type="primary", use_container_width=True):
+            # Track retry attempts
             st.session_state.retry_count[cp.id] = current_retry + 1
+
+            # Clear only answers (keep same questions)
             st.session_state.answers = {}
-            st.session_state.show_hint = {}
-            st.session_state.hints_cache = {}
-            st.session_state.feynman_explanations = {}
             st.session_state.quiz_submitted = False
-            
-            # MILESTONE 3: Generate new questions for adaptive re-assessment
-            with st.spinner("Generating new questions based on your weak areas..."):
-                st.session_state.questions = generate_questions(cp, st.session_state.study_material)
-            
-            # MILESTONE 3: Loop back to quiz stage
+
+            # Do NOT regenerate questions
+            # st.session_state.questions remains unchanged
+
+            # Go back to quiz
             st.session_state.stage = "quiz"
             st.rerun()
+
     
     with col2:
         if st.button("See Final Results", use_container_width=True):
