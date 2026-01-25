@@ -9,6 +9,8 @@
 
 > **📚 For detailed technical documentation, see [DOCUMENTATION.md](DOCUMENTATION.md)**  
 > **📂 For project structure details, see [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)**
+> **📚 For powerpoint presentation of project, see [View the Presentation on Google Drive](https://docs.google.com/presentation/d/1p6_p3DAklwd_cFwwA_puHAhCxapISqbF/edit?usp=drive_link&ouid=101528668188707336368&rtpof=true&sd=true)**
+
 
 ---
 
