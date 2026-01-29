@@ -31,7 +31,7 @@ class LearningState(TypedDict):
 
     gaps_list : Dict[int, str]
     gaps: str 
-    feynman_explanation: str
+    feynman_explanation: Optional[str] = None
 
     # =========================
     # CONTROL FLAGS (OPTIONAL)

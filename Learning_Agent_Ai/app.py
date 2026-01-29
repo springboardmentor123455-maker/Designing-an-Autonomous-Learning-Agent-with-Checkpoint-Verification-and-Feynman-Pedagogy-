@@ -1,6 +1,7 @@
 import streamlit as st
 from checkpoint_1 import CHECKPOINTS
 from graph_workflow import workflow
+from langgraph.types import Command
 from state import LearningState
 from ui_progress_store import ProgressStore
 from ui_upload_view import upload_view
@@ -13,10 +14,14 @@ from ui_upload_view import upload_view
 #     - Notes / PDF upload
 #     - Progress display
 #     """
+# ======================================================
+# STREAMLIT CONFIG
+# ======================================================
 st.set_page_config(
     page_title="Autonomous Learning Agent",
     layout="wide",
 )
+
 st.title("🎓 Autonomous Learning Agent")
 
     # -------------------------
@@ -27,8 +32,9 @@ saved = store.load()
 
 if "cp" not in st.session_state:
     st.session_state.cp = saved["checkpoint"] if saved else 0
+if "config" not in st.session_state:
+    st.session_state.config = {'configurable': {'thread_id': 'thread-1'}}
 if st.session_state.cp >=1:
-    # reset EVERYTHING before checkpoint is used
     st.session_state.cp = 0
     st.session_state.learning_state = None
     st.session_state.answers = []
@@ -38,7 +44,7 @@ if st.session_state.cp >=1:
         checkpoint_index=0,
     )
 
-    st.rerun()
+    # st.rerun()
 
 total = len(CHECKPOINTS)
 current = st.session_state.cp
@@ -96,28 +102,38 @@ if "learning_state" not in st.session_state:
 
 if "answers" not in st.session_state:
     st.session_state.answers = []
-
-store = ProgressStore()
-
-print(notes)
-print(checkpoint)
 # ======================================================
 # START / CONTINUE LEARNING
 # ======================================================
+config = st.session_state.config
+state = LearningState(
+    checkpoint=checkpoint,
+    user_Notes=notes,
+
+    answers=[],            # ✅ REQUIRED (prevents KeyError)
+    questions=[],
+    max_iteration=2,
+    context_iteration=1,
+    feynman_iteration=1,
+
+    gether_context= "",
+    chunks = [] ,
+    vectore_semalirty = [],
+    score_percentage = [],
+
+    gaps_list = {},
+    gaps = "",
+    feynman_explanation = "",
+    
+    passed=False
+)
 if st.button("🚀 Start / Continue Learning", type="primary"):
 
-    state = LearningState(
-        checkpoint=checkpoint,
-        user_Notes=notes,
-        answers=[],            # ✅ REQUIRED (prevents KeyError)
-        questions=[],
-        max_iteration=3,
-        context_iteration=1,
-        feynman_iteration=1,
-    )
-
-    st.session_state.learning_state = workflow.invoke(state)
-    st.rerun()
+    
+    print(state)
+    st.session_state.learning_state = workflow.invoke(state , config=config)
+    # st.rerun()
+    
 
 # ======================================================
 # SHOW LEARNING STATE
@@ -136,7 +152,7 @@ st.subheader("📚 Learning Context")
 st.write(state.get("gether_context", ""))
 
 if "revelence_score" in state:
-    st.caption(f"Relevance score: {state['revelence_score']}")
+    st.caption(f"Relevance score: {state['revelence_score'][-1]}")
 
 # ======================================================
 # QUESTIONS UI
@@ -144,8 +160,8 @@ if "revelence_score" in state:
 if "questions" in state and state["questions"]:
 
     st.subheader("❓ Assessment Questions")
-    st.session_state.answers = []
-
+    if len(st.session_state.answers) != len(state["questions"]):
+        st.session_state.answers = []    
     for idx, question in enumerate(state["questions"]):
         st.markdown(f"**Q{idx + 1}. {question}**")
         answer = st.text_area(
@@ -159,9 +175,10 @@ if "questions" in state and state["questions"]:
     # ==================================================
     if st.button("✅ Submit Answers"):
 
-        state["answers"] = st.session_state.answers
-        state = workflow.invoke(state)
+        state = workflow.invoke(Command(resume={"approved": "yes", 'answers':st.session_state.answers}),
+                config=config)
         st.session_state.learning_state = state
+        # st.rerun()
 
         st.divider()
         st.subheader("📊 Evaluation Result")
@@ -178,10 +195,7 @@ if "questions" in state and state["questions"]:
         if state.get("passed", False):
             st.success("🎉 Checkpoint PASSED!")
 
-            # store.save(
-            #     user_id="default_user",
-            #     checkpoint_index=st.session_state.cp + 1,
-            # )
+            
             if st.button("➡️ Go to Next Checkpoint"):
                 store.save(
                     user_id="default_user",
@@ -191,11 +205,7 @@ if "questions" in state and state["questions"]:
                 st.session_state.learning_state = None
                 st.session_state.answers = []
                 st.rerun()
-            # st.session_state.cp += 1
-            # st.session_state.learning_state = None
-            # st.info("Moving to next checkpoint...")
-            # st.rerun()
-
+        
         # =========================
         # FEYNMAN CASE
         # =========================

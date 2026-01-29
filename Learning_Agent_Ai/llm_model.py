@@ -18,7 +18,7 @@ model = ChatNVIDIA(
 
 model_1 = ChatNVIDIA(
   # model="google/gemma-3-1b-it",
-  model="deepseek-ai/deepseek-v3.2",
+  model="deepseek-ai/deepseek-v3.1",
 #   model="mistralai/mistral-7b-instruct-v0.2",
   api_key=os.getenv("NVIDIA_API_KEY"), 
   temperature=0.1,
