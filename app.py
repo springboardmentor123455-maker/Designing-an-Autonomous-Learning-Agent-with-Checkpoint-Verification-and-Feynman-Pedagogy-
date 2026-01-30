@@ -297,10 +297,105 @@ def render_file_upload():
             st.session_state.stage = 'learning'
             st.rerun()
 
+def render_study_materials():
+    """Display learning materials for study before assessment."""
+    st.header("📚 Study Materials")
+    st.info("Review the learning materials below before starting the assessment.")
+    
+    state = st.session_state.learning_state
+    
+    if not state:
+        st.error("No learning materials available.")
+        return
+    
+    # Display learning content as one continuous explanation
+    summary = state.get('summary', '')
+    materials = state.get('collected_materials', [])
+    
+    if summary:
+        st.markdown("### 📚 Study Material")
+        st.markdown("*Read through this comprehensive explanation carefully to prepare for the assessment.*")
+        st.markdown("")
+        
+        # Display as one continuous block with proper formatting
+        # Replace newlines with proper HTML breaks for better formatting
+        formatted_content = summary.replace('\n\n', '</p><p style="margin-top: 16px;">').replace('\n', '<br>')
+        
+        st.markdown(f"""
+        <div style="background-color: #ffffff; padding: 30px; border-radius: 10px; border: 2px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <div style="font-size: 16px; color: #1a1a1a; line-height: 1.8; text-align: justify;">
+                <p style="margin-top: 0;">
+                    {formatted_content}
+                </p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Show word count for reference
+        word_count = len(summary.split())
+        st.caption(f"📊 Content length: {word_count} words")
+    else:
+        st.warning("No learning content available.")
+    
+    # Extract and display resource links
+    resource_links = []
+    for material in materials:
+        url = material.get('url') or material.get('link') or material.get('source_url')
+        title = material.get('title', 'Resource')
+        source = material.get('source', 'Unknown')
+        
+        if url and url.startswith('http'):
+            resource_links.append({
+                'title': title,
+                'url': url,
+                'source': source
+            })
+    
+    # Display resource links section
+    if resource_links:
+        st.markdown("---")
+        st.markdown("### 🔗 Additional Resources")
+        st.markdown(f"Explore **{len(resource_links)} external resources** for deeper learning:")
+        st.markdown("")
+        
+        for i, resource in enumerate(resource_links, 1):
+            st.markdown(f"""
+            <div style="background-color: #e8f4f8; padding: 15px; border-radius: 6px; margin-bottom: 10px; border-left: 3px solid #2196F3;">
+                <div style="font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 6px;">
+                    {i}. {resource['title']}
+                </div>
+                <div style="margin-bottom: 4px;">
+                    <a href="{resource['url']}" target="_blank" style="color: #1565c0; text-decoration: none; font-size: 13px;">
+                        🔗 {resource['url']}
+                    </a>
+                </div>
+                <div style="font-size: 11px; color: #666;">
+                    <em>Source: {resource['source']}</em>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+    
+    # Button to proceed to assessment
+    st.markdown("")
+    st.markdown("---")
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button("✅ Start Assessment", use_container_width=True, type="primary"):
+            st.session_state.stage = 'learning'
+            st.rerun()
+
 def render_learning_session():
-    """Render the main learning session interface."""
+    """Render the learning session with materials, questions, and assessment."""
     path = st.session_state.selected_path
     checkpoint_idx = st.session_state.current_checkpoint_index
+    
+    if checkpoint_idx >= len(path['checkpoints']):
+        render_completion()
+        return
+    
+    checkpoint = path['checkpoints'][checkpoint_idx]
+    
+    # Progress bar
     
     if checkpoint_idx >= len(path['checkpoints']):
         render_completion()
@@ -382,7 +477,10 @@ def render_learning_session():
                     
                     if st.session_state.questions:
                         st.write(f"Generated {len(st.session_state.questions)} questions")
-                        status.update(label="Ready for assessment!", state="complete")
+                        st.session_state.study_materials_ready = True
+                        status.update(label="Study materials ready!", state="complete")
+                        # Redirect to study stage to show materials before assessment
+                        st.session_state.stage = 'study'
                     else:
                         st.write("No questions generated")
                         status.update(label="Error", state="error")
@@ -391,8 +489,12 @@ def render_learning_session():
                 st.error(f"Error running workflow: {e}")
                 logger.exception("Workflow error")
                 return
+            
+            # After processing, redirect to study stage
+            if st.session_state.study_materials_ready:
+                st.rerun()
     
-    # Display questions immediately after generation
+    # Display questions only if user has reviewed materials (coming from study stage)
     if st.session_state.questions and not st.session_state.answers:
         st.markdown("---")
         render_questions()
@@ -699,6 +801,7 @@ def reset_checkpoint():
     st.session_state.learning_state = None
     st.session_state.questions = []
     st.session_state.answers = {}
+    st.session_state.study_materials_ready = False
     st.session_state.stage = 'learning'
     
     # Store retry count for next iteration
@@ -717,6 +820,7 @@ def proceed_to_next_checkpoint():
     st.session_state.learning_state = None
     st.session_state.questions = []
     st.session_state.answers = {}
+    st.session_state.study_materials_ready = False
     st.session_state.stage = 'learning'
 
 def render_completion():
@@ -752,6 +856,8 @@ def main():
         render_path_selection()
     elif st.session_state.stage == 'upload_files':
         render_file_upload()
+    elif st.session_state.stage == 'study':
+        render_study_materials()
     elif st.session_state.stage == 'learning':
         render_learning_session()
     elif st.session_state.stage == 'results':

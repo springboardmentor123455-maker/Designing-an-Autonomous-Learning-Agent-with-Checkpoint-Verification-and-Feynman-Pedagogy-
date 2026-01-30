@@ -33,7 +33,7 @@ class DynamicMaterialsGenerator:
         """
         logger.info(f"🤖 Generating LLM-based materials for: {checkpoint['title']}")
         
-        prompt = f"""You are an expert educator creating comprehensive learning materials.
+        prompt = f"""You are an expert educator creating comprehensive learning materials IN ENGLISH.
 
 TOPIC: {checkpoint['title']}
 DESCRIPTION: {checkpoint['description']}
@@ -41,12 +41,14 @@ DESCRIPTION: {checkpoint['description']}
 LEARNING REQUIREMENTS:
 {chr(10).join(f"- {req}" for req in checkpoint['requirements'])}
 
-Generate comprehensive educational content that covers all requirements. Include:
+Generate comprehensive educational content IN ENGLISH LANGUAGE ONLY that covers all requirements. Include:
 1. Core concepts and definitions
 2. Key principles and how they work
 3. Practical examples and use cases
 4. Common patterns and best practices
 5. Important considerations and gotchas
+
+IMPORTANT: Write ONLY in English. Use clear, simple English language.
 
 Format the content in clear, structured paragraphs. Aim for 500-800 words of high-quality educational content.
 

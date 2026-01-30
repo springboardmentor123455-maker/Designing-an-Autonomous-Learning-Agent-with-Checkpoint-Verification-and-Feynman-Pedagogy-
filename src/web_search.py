@@ -44,16 +44,16 @@ class WebSearchService:
         """
         queries = []
         
-        # Primary query: topic title
-        queries.append(f"{checkpoint['title']} tutorial")
+        # Primary query: topic title with English constraint
+        queries.append(f"{checkpoint['title']} tutorial english")
         
-        # Secondary query: topic + "explained"
-        queries.append(f"{checkpoint['title']} explained for beginners")
+        # Secondary query: topic + "explained" with English constraint
+        queries.append(f"{checkpoint['title']} explained english")
         
-        # Tertiary query: from requirements
+        # Tertiary query: from requirements with English constraint
         if checkpoint.get('requirements'):
             first_req = checkpoint['requirements'][0][:60]  # First requirement, truncated
-            queries.append(f"{first_req}")
+            queries.append(f"{first_req} english")
         
         return queries[:max_queries]
     

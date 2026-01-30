@@ -147,23 +147,80 @@ async def summarize_materials_node(state: LearningAgentState) -> LearningAgentSt
         
         materials = state["collected_materials"]
         
-        # Create comprehensive summary
-        all_content = "\n\n".join([f"{mat['title']}: {mat['content']}" for mat in materials])
+        if not materials:
+            state["summary"] = f"Learning materials for {state['current_checkpoint']['title']} are being prepared."
+            logger.warning("⚠️ No materials to summarize")
+            state["workflow_history"].append("summarize_materials")
+            return state
         
-        # Generate summary using LLM
-        try:
-            summary_prompt = f"""
-Summarize the following learning materials in 2-3 paragraphs, focusing on key concepts and main points:
+        # First, translate material content to English
+        logger.info("🌐 Translating materials to English...")
+        for material in materials:
+            if material.get('content') and len(material['content']) > 50:
+                content = material['content'][:800]  # Limit to 800 chars for translation
+                
+                translate_prompt = f"""Translate this text to English. If already in English, return it as-is. Only provide the translated text, no explanations.
 
+{content}"""
+                
+                try:
+                    english_content = await asyncio.to_thread(llm_service.llm.invoke, translate_prompt)
+                    material['content'] = english_content.strip()
+                except Exception as e:
+                    logger.warning(f"Translation failed for {material.get('title')}: {e}")
+        
+        logger.info("✅ Materials translated")
+        
+        # Create summary from translated content
+        all_content = "\n\n".join([
+            f"Title: {mat['title']}\nContent: {mat['content'][:800]}" 
+            for mat in materials[:10]  # Limit to first 10 materials
+        ])
+        
+        # Generate detailed summary using LLM
+        try:
+            summary_prompt = f"""You are an expert educator. Create a comprehensive, detailed explanation of the following topic in English. Write at least 300 words of educational content that thoroughly prepares learners for an assessment.
+
+Topic: {state['current_checkpoint']['title']}
+
+Description: {state['current_checkpoint']['description']}
+
+Learning Materials:
 {all_content}
 
-Provide a clear, comprehensive summary that captures the essential information.
-"""
+Write a detailed, flowing explanation that covers:
+
+1. INTRODUCTION: Start with what the topic is and why it matters
+2. FUNDAMENTAL CONCEPTS: Explain the core ideas in depth - define key terms, explain how things work and WHY they work that way
+3. PRACTICAL EXAMPLES: Provide concrete examples and real-world use cases to illustrate concepts
+4. IMPLEMENTATION: Describe how to apply these concepts, including common patterns and approaches
+5. BEST PRACTICES: Share important guidelines, tips, and techniques professionals use
+6. COMMON PITFALLS: Warn about mistakes to avoid and challenges learners might face
+7. SUMMARY: Tie everything together with key takeaways
+
+Requirements:
+- Minimum 300 words (aim for 400-600 words)
+- Write in a continuous, flowing narrative style
+- Use clear, accessible language
+- Explain WHY, not just WHAT
+- Include specific examples
+- Make it engaging and easy to understand
+- Ensure all concepts needed for assessment are covered
+
+Write the complete explanation now:"""
+            
             summary = await asyncio.to_thread(llm_service.llm.invoke, summary_prompt)
-            state["summary"] = summary.strip()
-        except Exception:
+            summary_text = summary.strip()
+            
+            # Validate summary is not a conversational response
+            if "don't see" in summary_text.lower() or "please share" in summary_text.lower() or len(summary_text) < 200:
+                raise ValueError("Invalid summary response")
+                
+            state["summary"] = summary_text
+        except Exception as e:
+            logger.warning(f"Summary generation failed: {e}, using fallback")
             # Fallback summary
-            state["summary"] = f"Summary of {len(materials)} materials covering {state['current_checkpoint']['title']}. Key topics include the main concepts and requirements outlined in the learning objectives."
+            state["summary"] = f"This checkpoint covers {state['current_checkpoint']['title']}. The learning materials include {len(materials)} resources covering the key concepts and requirements. Review the materials to understand the core principles, practical applications, and best practices for this topic. Focus on understanding both the theoretical foundations and how to apply these concepts in real-world scenarios."
         
         logger.info(f"📄 Generated summary ({len(state['summary'])} characters)")
         
